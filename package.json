@@ -1,9 +1,9 @@
 {
-  "id": "shopro",
-  "name": "shopro",
-  "displayName": "芋道商城",
-  "version": "2026.03",
-  "description": "芋道商城，一套代码，同时发行到iOS、Android、H5、微信小程序多个平台，请使用手机扫码快速体验强大功能",
+  "id": "abao-mp-customer",
+  "name": "abao-mp-customer",
+  "displayName": "阿堡顾客小程序",
+  "version": "0.1.0",
+  "description": "阿堡餐饮 - 扫码点餐小程序",
   "scripts": {
     "prettier": "prettier --write  \"{pages,sheep}/**/*.{js,json,tsx,css,less,scss,vue,html,md}\""
   },

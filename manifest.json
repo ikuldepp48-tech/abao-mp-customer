@@ -1,8 +1,8 @@
 {
-  "name": "芋道商城",
+  "name": "阿堡",
   "appid": "__UNI__460BC4C",
-  "description": "基于 uni-app + Vue3 技术驱动的在线商城系统，内含诸多功能与丰富的活动，期待您的使用和反馈。",
-  "versionName": "2026.03",
+  "description": "阿堡餐饮 - 扫码点餐",
+  "versionName": "0.1.0",
   "versionCode": "183",
   "transformPx": false,
   "app-plus": {
@@ -68,7 +68,10 @@
         "schemes": "shopro"
       },
       "ios": {
-        "urlschemewhitelist": ["baidumap", "iosamap"],
+        "urlschemewhitelist": [
+          "baidumap",
+          "iosamap"
+        ],
         "dSYMs": false,
         "privacyDescription": {
           "NSPhotoLibraryUsageDescription": "需要同意访问您的相册选取图片才能完善该条目",
@@ -79,7 +82,9 @@
         "urltypes": "shopro",
         "capabilities": {
           "entitlements": {
-            "com.apple.developer.associated-domains": ["applinks:shopro.sheepjs.com"]
+            "com.apple.developer.associated-domains": [
+              "applinks:shopro.sheepjs.com"
+            ]
           }
         },
         "idfa": true
@@ -90,28 +95,36 @@
         "oauth": {
           "apple": {},
           "weixin": {
-            "appid": "wxae7a0c156da9383b",
-            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+            "appid": "wx7e67a4c42ede82a5",
+            "UniversalLinks": ""
           }
         },
         "payment": {
           "weixin": {
-            "__platform__": ["ios", "android"],
-            "appid": "wxae7a0c156da9383b",
-            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+            "__platform__": [
+              "ios",
+              "android"
+            ],
+            "appid": "wx7e67a4c42ede82a5",
+            "UniversalLinks": ""
           },
           "alipay": {
-            "__platform__": ["ios", "android"]
+            "__platform__": [
+              "ios",
+              "android"
+            ]
           }
         },
         "share": {
           "weixin": {
-            "appid": "wxae7a0c156da9383b",
-            "UniversalLinks": "https://shopro.sheepjs.com/uni-universallinks/__UNI__082C0BA/"
+            "appid": "wx7e67a4c42ede82a5",
+            "UniversalLinks": ""
           }
         }
       },
-      "orientation": ["portrait-primary"],
+      "orientation": [
+        "portrait-primary"
+      ],
       "splashscreen": {
         "androidStyle": "common",
         "iosStyle": "common",
@@ -169,7 +182,7 @@
     "versionCode": 100
   },
   "mp-weixin": {
-    "appid": "wx66186af0759f47c9",
+    "appid": "wx7e67a4c42ede82a5",
     "setting": {
       "urlCheck": false,
       "minified": true,
@@ -182,7 +195,9 @@
     "lazyCodeLoading": "requiredComponents",
     "usingComponents": {},
     "permission": {},
-    "requiredPrivateInfos": ["chooseAddress"]
+    "requiredPrivateInfos": [
+      "chooseAddress"
+    ]
   },
   "mp-alipay": {
     "usingComponents": true,

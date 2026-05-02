@@ -1,255 +1,97 @@
-<!-- 订单详情 -->
 <template>
-  <s-layout title="订单详情" class="index-wrap" navbar="inner">
-    <view
-      class="state-box ss-flex-col ss-col-center ss-row-right"
-      :style="[
-        {
-          marginTop: '-' + Number(statusBarHeight + 88) + 'rpx',
-          paddingTop: Number(statusBarHeight + 88) + 'rpx',
-        },
-      ]"
-    >
-      <view class="ss-flex ss-m-t-32 ss-m-b-20">
-        <!-- 待支付 -->
-        <image
-          v-if="state.orderInfo.status === 0"
-          class="state-img"
-          :src="sheep.$url.static('/static/img/shop/order/no_pay.png')"
-        />
-        <!-- 待发货 -->
-        <image
-          v-if="state.orderInfo.status === 10"
-          class="state-img"
-          :src="sheep.$url.static('/static/img/shop/order/order_loading.png')"
-        />
-        <!-- 已完成 -->
-        <image
-          v-else-if="state.orderInfo.status === 30"
-          class="state-img"
-          :src="sheep.$url.static('/static/img/shop/order/order_success.png')"
-        />
-        <!-- 已关闭 -->
-        <image
-          v-else-if="state.orderInfo.status === 40"
-          class="state-img"
-          :src="sheep.$url.static('/static/img/shop/order/order_close.png')"
-        />
-        <!-- 已发货 -->
-        <image
-          v-else-if="state.orderInfo.status === 20"
-          class="state-img"
-          :src="sheep.$url.static('/static/img/shop/order/order_express.png')"
-        />
-        <view class="ss-font-30">{{ formatOrderStatus(state.orderInfo) }}</view>
-      </view>
-      <view class="ss-font-26 ss-m-x-20 ss-m-b-70">
-        {{ formatOrderStatusDescription(state.orderInfo) }}
+  <s-layout title="订单详情" navbar="inner">
+    <!-- 状态头部 -->
+    <view class="status-header">
+      <view class="status-text">{{ statusLabel }}</view>
+      <view class="status-desc">{{ statusDesc }}</view>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-bar">
+      <view
+        v-for="(step, idx) in steps"
+        :key="idx"
+        class="progress-step"
+        :class="{ active: idx <= currentStep, last: idx === steps.length - 1 }"
+      >
+        <view class="step-dot" />
+        <view class="step-line" v-if="idx < steps.length - 1" />
+        <text class="step-label">{{ step }}</text>
       </view>
     </view>
 
-    <!-- 收货地址 -->
-    <view class="order-address-box" v-if="state.orderInfo.receiverAreaId > 0">
-      <view class="ss-flex ss-col-center">
-        <text class="address-username">
-          {{ state.orderInfo.receiverName }}
-        </text>
-        <text class="address-phone">{{ state.orderInfo.receiverMobile }}</text>
-      </view>
-      <view class="address-detail">
-        {{ state.orderInfo.receiverAreaName }} {{ state.orderInfo.receiverDetailAddress }}
-      </view>
-    </view>
-
-    <view
-      class="detail-goods"
-      :style="[{ marginTop: state.orderInfo.receiverAreaId > 0 ? '0' : '-40rpx' }]"
-    >
-      <!-- 订单信 -->
-      <view class="order-list" v-for="item in state.orderInfo.items" :key="item.goods_id">
-        <view class="order-card">
-          <s-goods-item
-            @tap="onGoodsDetail(item.spuId)"
-            :img="item.picUrl"
-            :title="item.spuName"
-            :skuText="item.properties.map((property) => property.valueName).join(' ')"
-            :price="item.price"
-            :num="item.count"
-          >
-            <template #tool>
-              <view class="ss-flex">
-                <button
-                  class="ss-reset-button apply-btn"
-                  v-if="[10, 20, 30].includes(state.orderInfo.status) && item.afterSaleStatus === 0"
-                  @tap.stop="
-                    sheep.$router.go('/pages/order/aftersale/apply', {
-                      orderId: state.orderInfo.id,
-                      itemId: item.id,
-                    })
-                  "
-                >
-                  申请售后
-                </button>
-                <button
-                  class="ss-reset-button apply-btn"
-                  v-if="item.afterSaleStatus === 10"
-                  @tap.stop="
-                    sheep.$router.go('/pages/order/aftersale/detail', {
-                      id: item.afterSaleId,
-                    })
-                  "
-                >
-                  退款中
-                </button>
-                <button
-                  class="ss-reset-button apply-btn"
-                  v-if="item.afterSaleStatus === 20"
-                  @tap.stop="
-                    sheep.$router.go('/pages/order/aftersale/detail', {
-                      id: item.afterSaleId,
-                    })
-                  "
-                >
-                  退款成功
-                </button>
-              </view>
-            </template>
-            <template #priceSuffix>
-              <button class="ss-reset-button tag-btn" v-if="item.status_text">
-                {{ item.status_text }}
-              </button>
-            </template>
-          </s-goods-item>
+    <!-- 订单商品 -->
+    <view class="detail-card ss-m-20">
+      <view class="detail-item" v-for="item in (state.orderInfo.items || [])" :key="item.skuId">
+        <view class="item-left">
+          <text class="item-name">{{ item.spuName || '菜品' }}</text>
+          <text class="item-sku" v-if="item.skuName">{{ item.skuName }}</text>
+          <text class="item-addons" v-if="item.addonsDesc && item.addonsDesc !== '[]'">{{ item.addonsDesc }}</text>
+        </view>
+        <view class="item-right">
+          <text class="item-price">¥{{ item.unitPrice }}</text>
+          <text class="item-qty">x{{ item.quantity }}</text>
         </view>
       </view>
     </view>
-
-    <!--  自提核销  -->
-    <PickUpVerify
-      :order-info="state.orderInfo"
-      :systemStore="systemStore"
-      ref="pickUpVerifyRef"
-    ></PickUpVerify>
 
     <!-- 订单信息 -->
-    <view class="notice-box">
-      <view class="notice-box__content">
-        <view class="notice-item--center">
-          <view class="ss-flex ss-flex-1">
-            <text class="title">订单编号：</text>
-            <text class="detail">{{ state.orderInfo.no }}</text>
-          </view>
-          <button class="ss-reset-button copy-btn" @tap="onCopy">复制</button>
+    <view class="info-card ss-m-20">
+      <view class="info-row">
+        <text class="info-label">订单编号</text>
+        <view class="info-right">
+          <text class="info-value">{{ state.orderInfo.orderNo }}</text>
+          <button class="copy-btn" @tap="onCopy">复制</button>
         </view>
-        <view class="notice-item">
-          <text class="title">下单时间：</text>
-          <text class="detail">
-            {{ sheep.$helper.timeFormat(state.orderInfo.createTime, 'yyyy-mm-dd hh:MM:ss') }}
-          </text>
-        </view>
-        <view class="notice-item" v-if="state.orderInfo.payTime">
-          <text class="title">支付时间：</text>
-          <text class="detail">
-            {{ sheep.$helper.timeFormat(state.orderInfo.payTime, 'yyyy-mm-dd hh:MM:ss') }}
-          </text>
-        </view>
-        <view class="notice-item">
-          <text class="title">支付方式：</text>
-          <text class="detail">{{ state.orderInfo.payChannelName || '-' }}</text>
-        </view>
+      </view>
+      <view class="info-row">
+        <text class="info-label">下单时间</text>
+        <text class="info-value">{{ formatTime(state.orderInfo.createTime) }}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">支付方式</text>
+        <text class="info-value">{{ state.orderInfo.payStatus === 1 ? '到店支付' : '待支付' }}</text>
       </view>
     </view>
 
-    <!-- 价格信息 -->
-    <view class="order-price-box">
-      <view class="notice-item ss-flex ss-row-between">
-        <text class="title">商品总额</text>
-        <view class="ss-flex">
-          <text class="detail">￥{{ fen2yuan(state.orderInfo.totalPrice) }}</text>
-        </view>
+    <!-- 金额信息 -->
+    <view class="price-card ss-m-20">
+      <view class="price-row">
+        <text class="price-label">商品金额</text>
+        <text class="price-value">¥{{ (state.orderInfo.originalAmount || 0).toFixed(2) }}</text>
       </view>
-      <view class="notice-item ss-flex ss-row-between">
-        <text class="title">运费</text>
-        <text class="detail">￥{{ fen2yuan(state.orderInfo.deliveryPrice) }}</text>
+      <view class="price-row" v-if="state.orderInfo.discountAmount > 0">
+        <text class="price-label">优惠金额</text>
+        <text class="price-value price-red">-¥{{ (state.orderInfo.discountAmount || 0).toFixed(2) }}</text>
       </view>
-      <view class="notice-item ss-flex ss-row-between" v-if="state.orderInfo.couponPrice > 0">
-        <text class="title">优惠劵金额</text>
-        <text class="detail">-¥{{ fen2yuan(state.orderInfo.couponPrice) }}</text>
-      </view>
-      <view class="notice-item ss-flex ss-row-between" v-if="state.orderInfo.pointPrice > 0">
-        <text class="title">积分抵扣</text>
-        <text class="detail">-¥{{ fen2yuan(state.orderInfo.pointPrice) }}</text>
-      </view>
-      <view class="notice-item ss-flex ss-row-between" v-if="state.orderInfo.discountPrice > 0">
-        <text class="title">活动优惠</text>
-        <text class="detail">¥{{ fen2yuan(state.orderInfo.discountPrice) }}</text>
-      </view>
-      <view class="notice-item ss-flex ss-row-between" v-if="state.orderInfo.vipPrice > 0">
-        <text class="title">会员优惠</text>
-        <text class="detail">-¥{{ fen2yuan(state.orderInfo.vipPrice) }}</text>
-      </view>
-      <view class="notice-item all-rpice-item ss-flex ss-m-t-20">
-        <text class="title">{{ state.orderInfo.payStatus ? '已付款' : '需付款' }}</text>
-        <text class="detail all-price">￥{{ fen2yuan(state.orderInfo.payPrice) }}</text>
-      </view>
-      <view
-        class="notice-item all-rpice-item ss-flex ss-m-t-20"
-        v-if="state.orderInfo.refundPrice > 0"
-      >
-        <text class="title">已退款</text>
-        <text class="detail all-price">￥{{ fen2yuan(state.orderInfo.refundPrice) }}</text>
+      <view class="price-row price-total">
+        <text class="price-label">实付金额</text>
+        <text class="price-value price-red price-big">¥{{ (state.orderInfo.payAmount || 0).toFixed(2) }}</text>
       </view>
     </view>
 
-    <!-- 底部按钮 -->
-    <!-- TODO: 查看物流、等待成团、评价完后返回页面没刷新页面 -->
-    <su-fixed bottom placeholder bg="bg-white" v-if="state.orderInfo.buttons?.length">
-      <view class="footer-box ss-flex ss-col-center ss-row-right">
+    <!-- 底部操作 -->
+    <su-fixed bottom placeholder bg="bg-white">
+      <view class="footer-box ss-flex ss-row-right ss-col-center ss-p-r-20">
         <button
-          class="ss-reset-button cancel-btn"
-          v-if="state.orderInfo.buttons?.includes('cancel')"
-          @tap="onCancel(state.orderInfo.id)"
+          v-if="state.orderInfo.status === 0"
+          class="action-btn cancel-btn"
+          @tap="onCancel"
         >
           取消订单
         </button>
         <button
-          class="ss-reset-button pay-btn ui-BG-Main-Gradient"
-          v-if="state.orderInfo.buttons?.includes('pay')"
-          @tap="onPay(state.orderInfo.payOrderId)"
+          v-if="state.orderInfo.status === 0"
+          class="action-btn pay-btn"
+          @tap="onPay"
         >
-          继续支付
+          确认支付
         </button>
         <button
-          class="ss-reset-button cancel-btn"
-          v-if="state.orderInfo.buttons?.includes('combination')"
-          @tap="
-            sheep.$router.go('/pages/activity/groupon/detail', {
-              id: state.orderInfo.combinationRecordId,
-            })
-          "
+          class="action-btn back-btn"
+          @tap="onBackHome"
         >
-          拼团详情
-        </button>
-        <button
-          class="ss-reset-button cancel-btn"
-          v-if="state.orderInfo.buttons?.includes('express')"
-          @tap="onExpress(state.orderInfo.id)"
-        >
-          查看物流
-        </button>
-        <button
-          class="ss-reset-button cancel-btn"
-          v-if="state.orderInfo.buttons?.includes('confirm')"
-          @tap="onConfirm(state.orderInfo.id)"
-        >
-          确认收货
-        </button>
-        <button
-          class="ss-reset-button cancel-btn"
-          v-if="state.orderInfo.buttons?.includes('comment')"
-          @tap="onComment(state.orderInfo.id)"
-        >
-          评价
+          返回首页
         </button>
       </view>
     </su-fixed>
@@ -257,424 +99,324 @@
 </template>
 
 <script setup>
-  import sheep from '@/sheep';
-  import { onLoad, onShow } from '@dcloudio/uni-app';
-  import { reactive, ref, watch } from 'vue';
-  import { isEmpty } from 'lodash-es';
-  import {
-    fen2yuan,
-    formatOrderStatus,
-    formatOrderStatusDescription,
-    handleOrderButtons,
-  } from '@/sheep/hooks/useGoods';
-  import OrderApi from '@/sheep/api/trade/order';
-  import DeliveryApi from '@/sheep/api/trade/delivery';
-  import PayOrderApi from '@/sheep/api/pay/order';
-  import PickUpVerify from '@/pages/order/pickUpVerify.vue';
+import { reactive, computed } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
+import sheep from '@/sheep';
+import OrderApi from '@/sheep/api/restaurant/restaurant_order';
 
-  const statusBarHeight = sheep.$platform.device.statusBarHeight * 2;
-  const headerBg = sheep.$url.css('/static/img/shop/order/order_bg.png');
+const steps = ['待支付', '已支付', '备餐中', '已出餐', '已完成'];
 
-  const state = reactive({
-    orderInfo: {},
-  });
+const state = reactive({
+  orderInfo: {},
+});
 
-  // ========== 门店自提（核销） ==========
-  const systemStore = ref({}); // 门店信息
+const statusLabel = computed(() => {
+  const map = { 0: '待支付', 1: '已支付', 2: '备餐中', 3: '已出餐', 4: '已完成', 5: '已取消' };
+  return map[state.orderInfo.status] || '未知';
+});
 
-  // 复制
-  const onCopy = () => {
-    sheep.$helper.copyText(state.orderInfo.no);
+const statusDesc = computed(() => {
+  const map = {
+    0: '订单已提交，请尽快完成支付',
+    1: '已支付，等待商家接单',
+    2: '商家正在备餐中',
+    3: '餐品已出餐，请取餐',
+    4: '订单已完成，欢迎再次光临',
+    5: '订单已取消',
   };
+  return map[state.orderInfo.status] || '';
+});
 
-  // 去支付
-  function onPay(payOrderId) {
-    sheep.$router.go('/pages/pay/index', {
-      id: payOrderId,
-    });
+const currentStep = computed(() => {
+  const s = state.orderInfo.status;
+  if (s === 5) return -1; // 已取消
+  return s || 0;
+});
+
+function formatTime(time) {
+  if (!time) return '-';
+  return time.replace('T', ' ').substring(0, 19);
+}
+
+function onCopy() {
+  sheep.$helper.copyText(state.orderInfo.orderNo || '');
+}
+
+async function getOrderDetail(id) {
+  const { code, data } = await OrderApi.getOrderDetail(id);
+  if (code === 0 && data) {
+    state.orderInfo = data;
+  } else {
+    sheep.$helper.toast('订单不存在');
   }
+}
 
-  // 查看商品
-  function onGoodsDetail(id) {
-    sheep.$router.go('/pages/goods/index', {
-      id,
-    });
-  }
-
-  // 取消订单
-  async function onCancel(orderId) {
-    uni.showModal({
-      title: '提示',
-      content: '确定要取消订单吗?',
-      success: async function (res) {
-        if (!res.confirm) {
-          return;
-        }
-        const { code } = await OrderApi.cancelOrder(orderId);
-        if (code === 0) {
-          await getOrderDetail(orderId);
-        }
-      },
-    });
-  }
-
-  // 查看物流
-  async function onExpress(id) {
-    sheep.$router.go('/pages/order/express/log', {
-      id,
-    });
-  }
-
-  // 确认收货
-  async function onConfirm(orderId, ignore = false) {
-    // 需开启确认收货组件
-    // todo: 芋艿：【微信物流】待接入微信 https://gitee.com/sheepjs/shopro-uniapp/commit/a6bbba49b84dd418b84c5fefc8b7463df8f4901f
-    // 1.怎么检测是否开启了发货组件功能？如果没有开启的话就不能在这里return出去
-    // 2.如果开启了走mpConfirm方法,需要在App.vue的show方法中拿到确认收货结果
-    let isOpenBusinessView = true;
-    if (
-      sheep.$platform.name === 'WechatMiniProgram' &&
-      !isEmpty(state.orderInfo.wechat_extra_data) &&
-      isOpenBusinessView &&
-      !ignore
-    ) {
-      mpConfirm(orderId);
-      return;
-    }
-
-    uni.showModal({
-      title: '提示',
-      content: '确认收货吗？',
-      success: async function (res) {
-        if (!res.confirm) {
-          return;
-        }
-        // 正常的确认收货流程
-        const { code } = await OrderApi.receiveOrder(orderId);
-        if (code === 0) {
-          await getOrderDetail(orderId);
-        }
-      },
-    });
-  }
-
-  // #ifdef MP-WEIXIN
-  // 小程序确认收货组件
-  function mpConfirm(orderId) {
-    if (!wx.openBusinessView) {
-      sheep.$helper.toast(`请升级微信版本`);
-      return;
-    }
-    wx.openBusinessView({
-      businessType: 'weappOrderConfirm',
-      extraData: {
-        merchant_trade_no: state.orderInfo.wechat_extra_data.merchant_trade_no,
-        transaction_id: state.orderInfo.wechat_extra_data.transaction_id,
-      },
-      success(response) {
-        console.log('success:', response);
-        if (response.errMsg === 'openBusinessView:ok') {
-          if (response.extraData.status === 'success') {
-            onConfirm(orderId, true);
-          }
-        }
-      },
-      fail(error) {
-        console.log('error:', error);
-      },
-      complete(result) {
-        console.log('result:', result);
-      },
-    });
-  }
-
-  // #endif
-
-  // 评价
-  function onComment(id) {
-    sheep.$router.go('/pages/goods/comment/add', {
-      id,
-    });
-  }
-
-  const pickUpVerifyRef = ref();
-
-  async function getOrderDetail(id) {
-    // 对详情数据进行适配
-    let res;
-    if (state.comeinType === 'wechat') {
-      // TODO 芋艿：【微信物流】微信场景下
-      res = await OrderApi.getOrderDetail(id, {
-        merchant_trade_no: state.merchantTradeNo,
-      });
-    } else {
-      res = await OrderApi.getOrderDetail(id);
-    }
-    if (res.code === 0) {
-      state.orderInfo = res.data;
-      handleOrderButtons(state.orderInfo);
-      // 配送方式：门店自提
-      if (res.data.pickUpStoreId) {
-        const { data } = await DeliveryApi.getDeliveryPickUpStore(res.data.pickUpStoreId);
-        systemStore.value = data || {};
+function onCancel() {
+  uni.showModal({
+    title: '提示',
+    content: '确定要取消订单吗？',
+    success: async (res) => {
+      if (!res.confirm) return;
+      const { code } = await OrderApi.cancelOrder(state.orderInfo.id);
+      if (code === 0) {
+        await getOrderDetail(state.orderInfo.id);
       }
-      if (state.orderInfo.deliveryType === 2 && state.orderInfo.payStatus) {
-        pickUpVerifyRef.value && pickUpVerifyRef.value.markCode(res.data.pickUpVerifyCode);
-      }
-    } else {
-      sheep.$router.back();
-    }
-  }
-
-  onShow(async () => {
-    // onShow 中获取订单列表,保证跳转后页面为最新状态
-    // 有几率在 onLoad 完成 state.orderInfo.id 赋值前进入 onShow
-    if (state.orderInfo.id) {
-      await getOrderDetail(state.orderInfo.id);
-    }
+    },
   });
+}
 
-  onLoad(async (options) => {
-    let id = 0;
-    if (options.id) {
-      id = options.id;
-    }
-    // 场景：例如说“微信小程序购物订单”
-    // https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/business-capabilities/order_center/order_center.html
-    // （小程序商品订单详情 path）配置参考：pages/order/detail?payOrderNo=${商品订单号} 。其中：${商品订单号} out_trade_no 为 payOrderNo
-    if (!id && options.payOrderNo) {
-      // 查询支付订单：根据 payOrderNo 取 merchantOrderId ，merchantOrderId 即 tradeOrderId
-      const payOrder = await PayOrderApi.getOrder(undefined, undefined, options.payOrderNo);
-      if (payOrder.code === 0) {
-        id = payOrder.data?.merchantOrderId;
-      }
-    }
-    state.orderInfo.id = id;
-    // 完成 state.orderInfo.id 赋值后加载一次detail，但有几率与 onShow 重复可能导致 detail 会加载两次。
-    await getOrderDetail(state.orderInfo.id);
-  });
+function onPay() {
+  sheep.$helper.toast('请到收银台付款');
+}
+
+function onBackHome() {
+  uni.switchTab({ url: '/pages/index/index' });
+}
+
+onLoad((options) => {
+  if (options.id) {
+    state.orderInfo.id = options.id;
+    getOrderDetail(options.id);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
-  .score-img {
-    width: 36rpx;
-    height: 36rpx;
-    margin: 0 4rpx;
+.status-header {
+  background: linear-gradient(135deg, $red, #E85D3A);
+  padding: 40rpx 30rpx 30rpx;
+  color: #fff;
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.status-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.progress-bar {
+  display: flex;
+  background: #fff;
+  padding: 30rpx 40rpx;
+  align-items: flex-start;
+}
+
+.progress-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step-dot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #ddd;
+  z-index: 1;
+}
+
+.progress-step.active .step-dot {
+  background: $red;
+}
+
+.step-line {
+  position: absolute;
+  top: 12rpx;
+  left: 50%;
+  width: 100%;
+  height: 4rpx;
+  background: #ddd;
+  z-index: 0;
+}
+
+.progress-step.active .step-line {
+  background: $red;
+}
+
+.step-label {
+  font-size: 20rpx;
+  color: #bbb;
+  margin-top: 10rpx;
+}
+
+.progress-step.active .step-label {
+  color: $red;
+  font-weight: 500;
+}
+
+.detail-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid #f5f5f5;
   }
+}
 
-  .apply-btn {
-    width: 140rpx;
-    height: 50rpx;
-    border-radius: 25rpx;
-    font-size: 24rpx;
-    border: 2rpx solid #dcdcdc;
-    line-height: normal;
-    margin-left: 16rpx;
+.item-left {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: $dark-3;
+}
+
+.item-sku {
+  font-size: 24rpx;
+  color: $dark-9;
+  margin-left: 8rpx;
+}
+
+.item-addons {
+  font-size: 22rpx;
+  color: $dark-a;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.item-right {
+  text-align: right;
+  margin-left: 20rpx;
+}
+
+.item-price {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.item-qty {
+  font-size: 24rpx;
+  color: $dark-9;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+
+  &:not(:last-child) {
+    border-bottom: 1rpx solid #f5f5f5;
   }
+}
 
-  .state-box {
-    color: rgba(#fff, 0.9);
-    width: 100%;
-    background: v-bind(headerBg) no-repeat,
-      linear-gradient(90deg, var(--ui-BG-Main), var(--ui-BG-Main-gradient));
-    background-size: 750rpx 100%;
-    box-sizing: border-box;
+.info-label {
+  font-size: 28rpx;
+  color: $dark-9;
+}
 
-    .state-img {
-      width: 60rpx;
-      height: 60rpx;
-      margin-right: 20rpx;
-    }
-  }
+.info-right {
+  display: flex;
+  align-items: center;
+}
 
-  .order-address-box {
-    background-color: #fff;
-    border-radius: 10rpx;
-    margin: -50rpx 20rpx 16rpx 20rpx;
-    padding: 44rpx 34rpx 42rpx 20rpx;
-    font-size: 30rpx;
-    box-sizing: border-box;
-    font-weight: 500;
-    color: rgba(51, 51, 51, 1);
+.info-value {
+  font-size: 28rpx;
+  color: $dark-3;
+}
 
-    .address-username {
-      margin-right: 20rpx;
-    }
+.copy-btn {
+  width: 80rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  background: #eee;
+  border-radius: 22rpx;
+  font-size: 22rpx;
+  color: $dark-6;
+  border: none;
+  margin-left: 16rpx;
+  padding: 0;
+}
 
-    .address-detail {
-      font-size: 26rpx;
-      font-weight: 500;
-      color: rgba(153, 153, 153, 1);
-      margin-top: 20rpx;
-    }
-  }
+.price-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
 
-  .detail-goods {
-    border-radius: 10rpx;
-    margin: 0 20rpx 20rpx 20rpx;
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
 
-    .order-list {
-      margin-bottom: 20rpx;
-      background-color: #fff;
+.price-label {
+  font-size: 28rpx;
+  color: $dark-9;
+}
 
-      .order-card {
-        padding: 20rpx 0;
+.price-value {
+  font-size: 28rpx;
+  color: $dark-3;
+}
 
-        .order-sku {
-          font-size: 24rpx;
+.price-red {
+  color: $red;
+}
 
-          font-weight: 400;
-          color: rgba(153, 153, 153, 1);
-          width: 450rpx;
-          margin-bottom: 20rpx;
+.price-big {
+  font-size: 32rpx;
+  font-weight: bold;
+}
 
-          .order-num {
-            margin-right: 10rpx;
-          }
-        }
+.price-total {
+  border-top: 1rpx solid #f5f5f5;
+  margin-top: 8rpx;
+  padding-top: 16rpx;
+}
 
-        .tag-btn {
-          margin-left: 16rpx;
-          font-size: 24rpx;
-          height: 36rpx;
-          color: var(--ui-BG-Main);
-          border: 2rpx solid var(--ui-BG-Main);
-          border-radius: 14rpx;
-          padding: 0 4rpx;
-        }
-      }
-    }
-  }
+.footer-box {
+  height: 100rpx;
+}
 
-  // 订单信息。
-  .notice-box {
-    background: #fff;
-    border-radius: 10rpx;
-    margin: 0 20rpx 20rpx 20rpx;
+.action-btn {
+  width: 160rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  border: none;
+  margin-left: 20rpx;
+  line-height: 60rpx;
+  padding: 0;
+}
 
-    .notice-box__head {
-      font-size: 30rpx;
+.cancel-btn {
+  background: #eee;
+  color: $dark-6;
+}
 
-      font-weight: 500;
-      color: rgba(51, 51, 51, 1);
-      line-height: 80rpx;
-      border-bottom: 1rpx solid #dfdfdf;
-      padding: 0 25rpx;
-    }
+.pay-btn {
+  background: $red;
+  color: #fff;
+}
 
-    .notice-box__content {
-      padding: 20rpx;
-
-      .self-pickup-box {
-        width: 100%;
-
-        .self-pickup--img {
-          width: 200rpx;
-          height: 200rpx;
-          margin: 40rpx 0;
-        }
-      }
-    }
-
-    .notice-item,
-    .notice-item--center {
-      display: flex;
-      align-items: center;
-      line-height: normal;
-      margin-bottom: 24rpx;
-
-      .title {
-        font-size: 28rpx;
-        color: #999;
-      }
-
-      .detail {
-        font-size: 28rpx;
-        color: #333;
-        flex: 1;
-      }
-    }
-  }
-
-  .copy-btn {
-    width: 100rpx;
-    line-height: 50rpx;
-    border-radius: 25rpx;
-    padding: 0;
-    background: rgba(238, 238, 238, 1);
-    font-size: 22rpx;
-    font-weight: 400;
-    color: rgba(51, 51, 51, 1);
-  }
-
-  // 订单价格信息
-  .order-price-box {
-    background-color: #fff;
-    border-radius: 10rpx;
-    padding: 20rpx;
-    margin: 0 20rpx 20rpx 20rpx;
-
-    .notice-item {
-      line-height: 70rpx;
-
-      .title {
-        font-size: 28rpx;
-        color: #999;
-      }
-
-      .detail {
-        font-size: 28rpx;
-        color: #333;
-        font-family: OPPOSANS;
-      }
-    }
-
-    .all-rpice-item {
-      justify-content: flex-end;
-      align-items: center;
-
-      .title {
-        font-size: 26rpx;
-        font-weight: 500;
-        color: #333333;
-        line-height: normal;
-      }
-
-      .all-price {
-        font-size: 26rpx;
-        font-family: OPPOSANS;
-        line-height: normal;
-        color: $red;
-      }
-    }
-  }
-
-  // 底部
-  .footer-box {
-    height: 100rpx;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 10rpx;
-    padding-right: 20rpx;
-
-    .cancel-btn {
-      width: 160rpx;
-      height: 60rpx;
-      background: #eeeeee;
-      border-radius: 30rpx;
-      margin-right: 20rpx;
-      font-size: 26rpx;
-      font-weight: 400;
-      color: #333333;
-    }
-
-    .pay-btn {
-      width: 160rpx;
-      height: 60rpx;
-      font-size: 26rpx;
-      border-radius: 30rpx;
-      font-weight: 500;
-      color: #fff;
-    }
-  }
+.back-btn {
+  background: #eee;
+  color: $dark-6;
+}
 </style>

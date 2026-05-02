@@ -72,8 +72,8 @@ const app = defineStore({
       // TODO 芋艿：【初始化优化】未来支持管理后台可配；对应 https://api.shopro.sheepjs.com/shop/api/init
       if (true) {
         this.info = {
-          name: '芋道商城',
-          logo: 'https://static.iocoder.cn/ruoyi-vue-pro-logo.png',
+          name: '阿堡',
+          logo: '/static/logo.png',
           version: '2026.03',
           copyright: '全部开源，个人与企业可 100% 免费使用',
           copytime: 'Copyright© 2018-2025',
@@ -182,15 +182,16 @@ const adaptTenant = async () => {
 
 /** 初始化装修模版 */
 const adaptTemplate = async (appTemplate, templateId) => {
-  const { data: diyTemplate } = templateId
-    ? // 查询指定模板，一般是预览时使用
-      await DiyApi.getDiyTemplate(templateId)
-    : await DiyApi.getUsedDiyTemplate();
-  // 模板不存在
-  if (!diyTemplate) {
-    $router.error('TemplateError');
-    return;
-  }
+  try {
+    const { data: diyTemplate } = templateId
+      ? // 查询指定模板，一般是预览时使用
+        await DiyApi.getDiyTemplate(templateId)
+      : await DiyApi.getUsedDiyTemplate();
+    // 模板不存在 — 使用默认布局，不阻塞
+    if (!diyTemplate) {
+      console.warn('未找到装修模板，使用默认布局');
+      return;
+    }
 
   const tabBar = diyTemplate?.property?.tabBar;
   if (tabBar) {
@@ -209,6 +210,9 @@ const adaptTemplate = async (appTemplate, templateId) => {
   }
   appTemplate.home = diyTemplate?.home;
   appTemplate.user = diyTemplate?.user;
+  } catch (e) {
+    console.warn('装修模板加载失败，使用默认布局:', e.message || e);
+  }
 };
 
 export default app;

@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import CartApi from '@/sheep/api/trade/cart';
 
+// 生成购物车项唯一标识
+function calcCartHash(item) {
+  const addonIds = (item.addons || []).map(a => a.id).sort().join(',');
+  return `${item.spuId}_${item.skuId}_${addonIds}_${item.remark || ''}`;
+}
+
 const cart = defineStore({
   id: 'cart',
   state: () => ({
@@ -10,7 +16,14 @@ const cart = defineStore({
     totalPriceSelected: 0, // 选中项总金额
     newList: [], // 除去已下架的购物车列表（validList）
     editMode: false, // 是否是编辑模式
+    // 餐厅本地购物车
+    localItems: [],
   }),
+  getters: {
+    totalItems: (state) => state.localItems.reduce((sum, i) => sum + i.quantity, 0),
+    totalPrice: (state) => state.localItems.reduce((sum, i) => sum + (i.unitPrice + (i.addons || []).reduce((s, a) => s + (a.extraPrice || 0), 0)) * i.quantity, 0),
+    localIsEmpty: (state) => state.localItems.length === 0,
+  },
   actions: {
     // 获取购物车列表
     async getList() {
@@ -106,6 +119,43 @@ const cart = defineStore({
       this.selectedIds = [];
       this.isAllSelected = true;
       this.totalPriceSelected = 0;
+      this.localItems = [];
+    },
+
+    // 本地购物车 - 添加菜品
+    addItem(item) {
+      const hash = calcCartHash(item);
+      const existing = this.localItems.find(i => calcCartHash(i) === hash);
+      if (existing) {
+        existing.quantity += (item.quantity || 1);
+      } else {
+        this.localItems.push({ ...item, cartItemId: Date.now().toString(), quantity: item.quantity || 1 });
+      }
+    },
+
+    // 本地购物车 - 移除菜品
+    removeItem(cartItemId) {
+      const idx = this.localItems.findIndex(i => i.cartItemId === cartItemId);
+      if (idx >= 0) this.localItems.splice(idx, 1);
+    },
+
+    // 本地购物车 - 增减数量
+    increaseQuantity(cartItemId) {
+      const item = this.localItems.find(i => i.cartItemId === cartItemId);
+      if (item) item.quantity++;
+    },
+
+    decreaseQuantity(cartItemId) {
+      const item = this.localItems.find(i => i.cartItemId === cartItemId);
+      if (item) {
+        item.quantity--;
+        if (item.quantity <= 0) this.removeItem(cartItemId);
+      }
+    },
+
+    // 本地购物车 - 清空
+    clearLocalCart() {
+      this.localItems = [];
     },
   },
   persist: {

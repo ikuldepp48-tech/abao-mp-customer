@@ -6,7 +6,8 @@
 			"^su-(.*)": "@/sheep/ui/su-$1/su-$1.vue"
 		}
 	},
-	"pages": [{
+	"pages": [
+		{
 			"path": "pages/index/index",
 			"aliasPath": "/",
 			"style": {
@@ -82,11 +83,117 @@
 				"title": "自定义页面",
 				"group": "商城"
 			}
+		},
+		{
+			"path": "pages/scan/index",
+			"style": {
+				"navigationBarTitleText": "扫码识别"
+			},
+			"meta": {
+				"auth": false
+			}
+		},
+		{
+			"path": "pages/order/list",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"enablePullDownRefresh": true
+			},
+			"meta": {
+				"auth": false,
+				"sync": true,
+				"title": "用户订单",
+				"group": "订单中心"
+			}
+		},
+		{
+			"path": "pages/order/detail",
+			"style": {
+				"navigationBarTitleText": "订单详情"
+			},
+			"meta": {
+				"auth": true,
+				"title": "订单详情"
+			}
+		},
+		{
+			"path": "pages/order/confirm",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			},
+			"meta": {
+				"auth": true,
+				"title": "确认订单"
+			}
+		},
+		{
+			"path": "pages/order/aftersale/apply",
+			"style": {
+				"navigationBarTitleText": "申请售后"
+			},
+			"meta": {
+				"auth": true,
+				"title": "申请售后"
+			}
+		},
+		{
+			"path": "pages/order/aftersale/return-delivery",
+			"style": {
+				"navigationBarTitleText": "退货物流"
+			},
+			"meta": {
+				"auth": true,
+				"title": "退货物流"
+			}
+		},
+		{
+			"path": "pages/order/aftersale/list",
+			"style": {
+				"navigationBarTitleText": "售后列表"
+			},
+			"meta": {
+				"auth": true,
+				"sync": true,
+				"title": "售后订单",
+				"group": "订单中心"
+			}
+		},
+		{
+			"path": "pages/order/aftersale/detail",
+			"style": {
+				"navigationBarTitleText": "售后详情"
+			},
+			"meta": {
+				"auth": true,
+				"title": "售后详情"
+			}
+		},
+		{
+			"path": "pages/order/aftersale/log",
+			"style": {
+				"navigationBarTitleText": "售后进度"
+			},
+			"meta": {
+				"auth": true,
+				"title": "售后进度"
+			}
+		},
+		{
+			"path": "pages/order/express/log",
+			"style": {
+				"navigationBarTitleText": "物流轨迹"
+			},
+			"meta": {
+				"auth": true,
+				"title": "物流轨迹"
+			}
 		}
 	],
-	"subPackages": [{
+	"subPackages": [
+		{
 			"root": "pages/goods",
-			"pages": [{
+			"pages": [
+				{
 					"path": "index",
 					"style": {
 						"navigationBarTitleText": "商品详情"
@@ -97,40 +204,6 @@
 						"group": "商品"
 					}
 				},
-				{
-					"path": "groupon",
-					"style": {
-						"navigationBarTitleText": "拼团商品"
-					},
-					"meta": {
-						"sync": true,
-						"title": "拼团商品",
-						"group": "商品"
-					}
-				},
-
-				{
-					"path": "seckill",
-					"style": {
-						"navigationBarTitleText": "秒杀商品"
-					},
-					"meta": {
-						"sync": true,
-						"title": "秒杀商品",
-						"group": "商品"
-					}
-				},
-                {
-                    "path": "point",
-                    "style": {
-                      "navigationBarTitleText": "积分商品"
-                    },
-                    "meta": {
-                      "sync": true,
-                      "title": "积分商品",
-                      "group": "商品"
-                    }
-                },
 				{
 					"path": "list",
 					"style": {
@@ -160,107 +233,9 @@
 			]
 		},
 		{
-			"root": "pages/order",
-			"pages": [{
-					"path": "detail",
-					"style": {
-						"navigationBarTitleText": "订单详情"
-					},
-					"meta": {
-						"auth": true,
-						"title": "订单详情"
-					}
-				},
-				{
-					"path": "confirm",
-					"style": {
-						"navigationBarTitleText": "确认订单"
-					},
-					"meta": {
-						"auth": true,
-						"title": "确认订单"
-					}
-				},
-				{
-					"path": "list",
-					"style": {
-						"navigationBarTitleText": "我的订单",
-						"enablePullDownRefresh": true
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "用户订单",
-						"group": "订单中心"
-					}
-				},
-				{
-					"path": "aftersale/apply",
-					"style": {
-						"navigationBarTitleText": "申请售后"
-					},
-					"meta": {
-						"auth": true,
-						"title": "申请售后"
-					}
-				},
-                {
-                  "path": "aftersale/return-delivery",
-                  "style": {
-                    "navigationBarTitleText": "退货物流"
-                  },
-                  "meta": {
-                    "auth": true,
-                    "title": "退货物流"
-                  }
-                },
-				{
-					"path": "aftersale/list",
-					"style": {
-						"navigationBarTitleText": "售后列表"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "售后订单",
-						"group": "订单中心"
-					}
-				},
-				{
-					"path": "aftersale/detail",
-					"style": {
-						"navigationBarTitleText": "售后详情"
-					},
-					"meta": {
-						"auth": true,
-						"title": "售后详情"
-					}
-				},
-				{
-					"path": "aftersale/log",
-					"style": {
-						"navigationBarTitleText": "售后进度"
-					},
-					"meta": {
-						"auth": true,
-						"title": "售后进度"
-					}
-				},
-				{
-					"path": "express/log",
-					"style": {
-						"navigationBarTitleText": "物流轨迹"
-					},
-					"meta": {
-						"auth": true,
-						"title": "物流轨迹"
-					}
-				}
-			]
-		},
-		{
 			"root": "pages/user",
-			"pages": [{
+			"pages": [
+				{
 					"path": "info",
 					"style": {
 						"navigationBarTitleText": "我的信息"
@@ -318,18 +293,18 @@
 						"title": "编辑地址"
 					}
 				},
-                {
-                  "path": "goods_details_store/index",
-                  "style": {
-                    "navigationBarTitleText": "自提门店"
-                  },
-                  "meta": {
-                    "auth": true,
-                    "sync": true,
-                    "title": "地址管理",
-                    "group": "用户中心"
-                  }
-                },
+				{
+					"path": "goods_details_store/index",
+					"style": {
+						"navigationBarTitleText": "自提门店"
+					},
+					"meta": {
+						"auth": true,
+						"sync": true,
+						"title": "地址管理",
+						"group": "用户中心"
+					}
+				},
 				{
 					"path": "wallet/money",
 					"style": {
@@ -357,120 +332,9 @@
 			]
 		},
 		{
-			"root": "pages/commission",
-			"pages": [{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "分销"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "分销中心",
-						"group": "分销商城"
-					}
-				},
-				{
-					"path": "wallet",
-					"style": {
-						"navigationBarTitleText": "我的佣金"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "用户佣金",
-						"group": "分销中心"
-					}
-				},
-				{
-					"path": "goods",
-					"style": {
-						"navigationBarTitleText": "推广商品"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "推广商品",
-						"group": "分销商城"
-					}
-				},
-				{
-					"path": "order",
-					"style": {
-						"navigationBarTitleText": "分销订单"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "分销订单",
-						"group": "分销商城"
-					}
-				},
-				{
-					"path": "team",
-					"style": {
-						"navigationBarTitleText": "我的团队"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "我的团队",
-						"group": "分销商城"
-					}
-				}, {
-					"path": "promoter",
-					"style": {
-						"navigationBarTitleText": "推广人排行榜"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "推广人排行榜",
-						"group": "分销商城"
-					}
-				}, {
-					"path": "commission-ranking",
-					"style": {
-						"navigationBarTitleText": "佣金排行榜"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "佣金排行榜",
-						"group": "分销商城"
-					}
-				}, {
-                "path": "withdraw",
-                "style": {
-                  "navigationBarTitleText": "申请提现"
-                },
-                "meta": {
-                  "auth": true,
-                  "sync": true,
-                  "title": "申请提现",
-                  "group": "分销商城"
-                }
-              }
-			]
-		},
-		{
-			"root": "pages/app",
-			"pages": [{
-				"path": "sign",
-				"style": {
-					"navigationBarTitleText": "签到中心"
-				},
-				"meta": {
-					"auth": true,
-					"sync": true,
-					"title": "签到中心",
-					"group": "应用"
-				}
-			}]
-		},
-		{
 			"root": "pages/public",
-			"pages": [{
+			"pages": [
+				{
 					"path": "setting",
 					"style": {
 						"navigationBarTitleText": "系统设置"
@@ -518,53 +382,29 @@
 			]
 		},
 		{
-			"root": "pages/coupon",
-			"pages": [{
-					"path": "list",
-					"style": {
-						"navigationBarTitleText": "领券中心"
-					},
-					"meta": {
-						"sync": true,
-						"title": "领券中心",
-						"group": "优惠券"
-					}
-				},
+			"root": "pages/chat",
+			"pages": [
 				{
-					"path": "detail",
+					"path": "index",
 					"style": {
-						"navigationBarTitleText": "优惠券"
+						"navigationBarTitleText": "客服",
+						"app-plus": {
+							"softinputMode": "adjustResize"
+						}
 					},
 					"meta": {
-						"auth": false,
+						"auth": true,
 						"sync": true,
-						"title": "优惠券详情",
-						"group": "优惠券"
+						"title": "客服",
+						"group": "客服"
 					}
 				}
 			]
 		},
 		{
-			"root": "pages/chat",
-			"pages": [{
-				"path": "index",
-				"style": {
-					"navigationBarTitleText": "客服",
-                    "app-plus": {
-                      "softinputMode": "adjustResize"
-                    }
-				},
-				"meta": {
-					"auth": true,
-					"sync": true,
-					"title": "客服",
-					"group": "客服"
-				}
-			}]
-		},
-		{
 			"root": "pages/pay",
-			"pages": [{
+			"pages": [
+				{
 					"path": "index",
 					"style": {
 						"navigationBarTitleText": "收银台"
@@ -603,100 +443,58 @@
 			]
 		},
 		{
-			"root": "pages/activity",
-			"pages": [{
-					"path": "groupon/detail",
-					"style": {
-						"navigationBarTitleText": "拼团详情"
-					}
-				},
+			"root": "pages/dish",
+			"pages": [
 				{
-					"path": "groupon/order",
+					"path": "detail",
 					"style": {
-						"navigationBarTitleText": "我的拼团",
-						"enablePullDownRefresh": true
+						"navigationBarTitleText": "菜品详情"
 					},
 					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "拼团订单",
-						"group": "营销活动"
+						"auth": false
 					}
-				},
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "营销商品"
-					},
-					"meta": {
-						"sync": true,
-						"title": "营销商品",
-						"group": "营销活动"
-					}
-				},
-				{
-					"path": "groupon/list",
-					"style": {
-						"navigationBarTitleText": "拼团活动"
-					},
-					"meta": {
-						"sync": true,
-						"title": "拼团活动",
-						"group": "营销活动"
-					}
-				},
-				{
-					"path": "seckill/list",
-					"style": {
-						"navigationBarTitleText": "秒杀活动"
-					},
-					"meta": {
-						"sync": true,
-						"title": "秒杀活动",
-						"group": "营销活动"
-					}
-				},
-                {
-                  "path": "point/list",
-                  "style": {
-                    "navigationBarTitleText": "积分商城"
-                  },
-                  "meta": {
-                    "sync": true,
-                    "title": "积分商城",
-                    "group": "营销活动"
-                  }
-                }
+				}
 			]
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "芋道商城",
+		"navigationBarTitleText": "阿堡",
 		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#FFFFFF",
 		"navigationStyle": "custom",
-    "mp-alipay": {
-      "titleImage": "",
-      "gestureBack": "YES",
-      "allowsBounceVertical": "NO",
-      "transparentTitle": "always",
-      "navigationStyle": "custom",
-      "titlePenetrate": "YES"
-    }
+		"mp-alipay": {
+			"titleImage": "",
+			"gestureBack": "YES",
+			"allowsBounceVertical": "NO",
+			"transparentTitle": "always",
+			"navigationStyle": "custom",
+			"titlePenetrate": "YES"
+		}
 	},
 	"tabBar": {
-		"list": [{
-				"pagePath": "pages/index/index"
-			},
-            {
-				"pagePath": "pages/index/category"
-            },
+		"color": "#999999",
+		"selectedColor": "#D4351C",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [
 			{
-				"pagePath": "pages/index/cart"
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png"
 			},
 			{
-				"pagePath": "pages/index/user"
+				"pagePath": "pages/order/list",
+				"text": "订单",
+				"iconPath": "static/tabbar/order.png",
+				"selectedIconPath": "static/tabbar/order-active.png"
+			},
+			{
+				"pagePath": "pages/index/user",
+				"text": "我的",
+				"iconPath": "static/tabbar/user.png",
+				"selectedIconPath": "static/tabbar/user-active.png"
 			}
 		]
 	}
