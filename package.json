@@ -5,6 +5,8 @@
   "version": "0.1.0",
   "description": "阿堡餐饮 - 扫码点餐小程序",
   "scripts": {
+    "dev:mp-weixin": "UNI_PLATFORM=mp-weixin UNI_INPUT_DIR=$(pwd) npx vite",
+    "build:mp-weixin": "UNI_PLATFORM=mp-weixin UNI_INPUT_DIR=$(pwd) NODE_ENV=production npx vite build",
     "prettier": "prettier --write  \"{pages,sheep}/**/*.{js,json,tsx,css,less,scss,vue,html,md}\""
   },
   "repository": "https://github.com/sheepjs/shop.git",
@@ -94,10 +96,16 @@
     "luch-request": "^3.0.8",
     "pinia": "^2.0.33",
     "pinia-plugin-persist-uni": "^1.2.0",
+    "vue": "^3.4.21",
     "weixin-js-sdk": "^1.6.0"
   },
   "devDependencies": {
+    "@dcloudio/uni-app": "^3.0.0-alpha-5000720260416001",
+    "@dcloudio/uni-mp-weixin": "^3.0.0-alpha-5000720260416001",
+    "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-5000720260416001",
     "prettier": "^2.8.7",
-    "vconsole": "^3.15.0"
+    "sass": "^1.99.0",
+    "vconsole": "^3.15.0",
+    "vite": "^5.4.21"
   }
 }

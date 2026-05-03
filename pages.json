@@ -34,17 +34,6 @@
 			}
 		},
 		{
-			"path": "pages/index/category",
-			"style": {
-				"navigationBarTitleText": "商品分类"
-			},
-			"meta": {
-				"sync": true,
-				"title": "商品分类",
-				"group": "商城"
-			}
-		},
-		{
 			"path": "pages/index/cart",
 			"style": {
 				"navigationBarTitleText": "购物车"
@@ -52,6 +41,17 @@
 			"meta": {
 				"sync": true,
 				"title": "购物车",
+				"group": "商城"
+			}
+		},
+		{
+			"path": "pages/index/category",
+			"style": {
+				"navigationBarTitleText": "商品分类"
+			},
+			"meta": {
+				"sync": true,
+				"title": "商品分类",
 				"group": "商城"
 			}
 		},
@@ -69,18 +69,6 @@
 			"meta": {
 				"sync": true,
 				"title": "搜索",
-				"group": "商城"
-			}
-		},
-		{
-			"path": "pages/index/page",
-			"style": {
-				"navigationBarTitleText": ""
-			},
-			"meta": {
-				"auth": false,
-				"sync": true,
-				"title": "自定义页面",
 				"group": "商城"
 			}
 		},
@@ -134,58 +122,6 @@
 			"meta": {
 				"auth": true,
 				"title": "申请售后"
-			}
-		},
-		{
-			"path": "pages/order/aftersale/return-delivery",
-			"style": {
-				"navigationBarTitleText": "退货物流"
-			},
-			"meta": {
-				"auth": true,
-				"title": "退货物流"
-			}
-		},
-		{
-			"path": "pages/order/aftersale/list",
-			"style": {
-				"navigationBarTitleText": "售后列表"
-			},
-			"meta": {
-				"auth": true,
-				"sync": true,
-				"title": "售后订单",
-				"group": "订单中心"
-			}
-		},
-		{
-			"path": "pages/order/aftersale/detail",
-			"style": {
-				"navigationBarTitleText": "售后详情"
-			},
-			"meta": {
-				"auth": true,
-				"title": "售后详情"
-			}
-		},
-		{
-			"path": "pages/order/aftersale/log",
-			"style": {
-				"navigationBarTitleText": "售后进度"
-			},
-			"meta": {
-				"auth": true,
-				"title": "售后进度"
-			}
-		},
-		{
-			"path": "pages/order/express/log",
-			"style": {
-				"navigationBarTitleText": "物流轨迹"
-			},
-			"meta": {
-				"auth": true,
-				"title": "物流轨迹"
 			}
 		}
 	],
@@ -248,30 +184,6 @@
 					}
 				},
 				{
-					"path": "goods-collect",
-					"style": {
-						"navigationBarTitleText": "我的收藏"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "商品收藏",
-						"group": "用户中心"
-					}
-				},
-				{
-					"path": "goods-log",
-					"style": {
-						"navigationBarTitleText": "我的足迹"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "浏览记录",
-						"group": "用户中心"
-					}
-				},
-				{
 					"path": "address/list",
 					"style": {
 						"navigationBarTitleText": "收货地址"
@@ -291,42 +203,6 @@
 					"meta": {
 						"auth": true,
 						"title": "编辑地址"
-					}
-				},
-				{
-					"path": "goods_details_store/index",
-					"style": {
-						"navigationBarTitleText": "自提门店"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "地址管理",
-						"group": "用户中心"
-					}
-				},
-				{
-					"path": "wallet/money",
-					"style": {
-						"navigationBarTitleText": "我的余额"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "用户余额",
-						"group": "用户中心"
-					}
-				},
-				{
-					"path": "wallet/score",
-					"style": {
-						"navigationBarTitleText": "我的积分"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "用户积分",
-						"group": "用户中心"
 					}
 				}
 			]
@@ -382,26 +258,6 @@
 			]
 		},
 		{
-			"root": "pages/chat",
-			"pages": [
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "客服",
-						"app-plus": {
-							"softinputMode": "adjustResize"
-						}
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "客服",
-						"group": "客服"
-					}
-				}
-			]
-		},
-		{
 			"root": "pages/pay",
 			"pages": [
 				{
@@ -414,30 +270,6 @@
 					"path": "result",
 					"style": {
 						"navigationBarTitleText": "支付结果"
-					}
-				},
-				{
-					"path": "recharge",
-					"style": {
-						"navigationBarTitleText": "充值余额"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "充值余额",
-						"group": "支付"
-					}
-				},
-				{
-					"path": "recharge-log",
-					"style": {
-						"navigationBarTitleText": "充值记录"
-					},
-					"meta": {
-						"auth": true,
-						"sync": true,
-						"title": "充值记录",
-						"group": "支付"
 					}
 				}
 			]
