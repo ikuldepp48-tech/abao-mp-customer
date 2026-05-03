@@ -1,10 +1,17 @@
 <script setup>
   import { onLaunch, onShow, onError } from '@dcloudio/uni-app';
-  import { ShoproInit } from './sheep';
+  import sheep, { ShoproInit } from './sheep';
+  import $store from '@/sheep/store';
 
   onLaunch(() => {
     // 加载Shopro底层依赖
-    ShoproInit();
+    ShoproInit().then(() => {
+      // 首次进入小程序 → 静默微信登录
+      const userStore = $store('user');
+      if (!userStore.isLogin) {
+        sheep.$platform.useProvider('wechat').login();
+      }
+    });
   });
 
   onShow(() => {

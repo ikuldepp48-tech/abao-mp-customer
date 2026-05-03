@@ -1,12 +1,12 @@
 import request from '@/sheep/request';
 
 const TableApi = {
-  // 扫桌台二维码识别
-  scanTable: (storeId, tableId) => {
+  // 扫桌台二维码识别（通过加密 token）
+  scanTable: (token) => {
     return request({
       url: '/restaurant/table/scan',
       method: 'GET',
-      params: { storeId, tableId },
+      params: { token },
       custom: {
         auth: false,
         showLoading: true,

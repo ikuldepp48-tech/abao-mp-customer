@@ -27,6 +27,7 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import TableApi from '@/sheep/api/restaurant/restaurant_table';
 import $store from '@/sheep/store';
+import sheep from '@/sheep';
 
 const status = ref('loading'); // loading | success | error
 const errorMsg = ref('');
@@ -34,23 +35,23 @@ const storeName = ref('');
 const tableNo = ref('');
 
 onLoad(async (options) => {
-  const { storeId, tableId } = options;
+  const { token } = options;
 
-  if (!storeId || !tableId) {
+  if (!token) {
     status.value = 'error';
     errorMsg.value = '二维码无效，请扫桌台上的点餐二维码';
     return;
   }
 
-  await doScan(Number(storeId), Number(tableId));
+  await doScan(token);
 });
 
-async function doScan(storeId, tableId) {
+async function doScan(token) {
   try {
-    const { code, data } = await TableApi.scanTable(storeId, tableId);
+    const { code, msg, data } = await TableApi.scanTable(token);
     if (code !== 0 || !data) {
       status.value = 'error';
-      errorMsg.value = '桌台信息无效，请联系店员';
+      errorMsg.value = msg || '桌台信息无效，请联系店员';
       return;
     }
 
@@ -71,6 +72,12 @@ async function doScan(storeId, tableId) {
     tableNo.value = data.tableNo;
     status.value = 'success';
 
+    // 确保已登录（静默微信登录）
+    const userStore = $store('user');
+    if (!userStore.isLogin) {
+      await sheep.$platform.useProvider('wechat').login();
+    }
+
     // 延迟跳转首页
     setTimeout(() => {
       uni.switchTab({ url: '/pages/index/index' });
@@ -84,19 +91,19 @@ async function doScan(storeId, tableId) {
 function handleRetry() {
   uni.scanCode({
     success: (res) => {
-      // 解析二维码URL中的参数
+      // 解析二维码URL：scan?token=xxx
       const url = res.result;
       const params = {};
       if (url.includes('?')) {
         const query = url.split('?')[1];
         query.split('&').forEach((pair) => {
           const [k, v] = pair.split('=');
-          params[k] = v;
+          params[k] = decodeURIComponent(v);
         });
       }
-      if (params.storeId && params.tableId) {
+      if (params.token) {
         status.value = 'loading';
-        doScan(Number(params.storeId), Number(params.tableId));
+        doScan(params.token);
       } else {
         errorMsg.value = '请扫描桌台上的点餐二维码';
       }
