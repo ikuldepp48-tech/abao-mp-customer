@@ -18,7 +18,7 @@
           <text class="dish-price">¥{{ dish.minPrice }}</text>
         </view>
         <view v-if="dish.isSoldOut" class="dish-btn sold-out">已沽清</view>
-        <view v-else-if="needSpec" class="dish-btn spec" @click.stop="handleClick">选规格</view>
+        <view v-else-if="needSpec" class="dish-btn spec" @click.stop="$emit('add', dish)">选规格</view>
         <view v-else class="dish-btn add" @click.stop="$emit('add', dish)">+</view>
       </view>
     </view>

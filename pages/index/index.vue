@@ -119,6 +119,14 @@
         </scroll-view>
       </view>
     </su-popup>
+
+    <!-- 加料弹窗 -->
+    <AddonModal
+      :visible="showAddonModal"
+      :dish="selectedDish"
+      @close="showAddonModal = false"
+      @confirm="showAddonModal = false"
+    />
   </view>
 </template>
 
@@ -127,6 +135,7 @@ import { ref, computed, nextTick } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
 import DishCard from './components/DishCard.vue';
+import AddonModal from './components/AddonModal.vue';
 
 const menuStore = sheep.$store('menu');
 const storeStore = sheep.$store('store');
@@ -139,6 +148,8 @@ const combos = ref([]);
 const activeCategory = ref(0);
 const scrollToId = ref('');
 const showCartPopup = ref(false);
+const showAddonModal = ref(false);
+const selectedDish = ref({});
 const sectionTops = ref([]); // 各分类区域的偏移量（用于滚动联动）
 
 const storeName = computed(() => storeStore.storeName);
@@ -230,7 +241,8 @@ function quickAdd(dish) {
     });
     uni.showToast({ title: '已加入', icon: 'none', duration: 1000 });
   } else {
-    goDetail(dish);
+    selectedDish.value = dish;
+    showAddonModal.value = true;
   }
 }
 
