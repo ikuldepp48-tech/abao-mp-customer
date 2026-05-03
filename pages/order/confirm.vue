@@ -130,7 +130,7 @@ async function onSubmit() {
     const { code, data } = await OrderApi.createOrder({
       storeId: storeStore.storeId,
       tableId: tableStore.tableId || 0,
-      orderType: 0,
+      orderType: 1,
       dinerCount: dinerCount.value,
       items,
       remark: remark.value,
