@@ -1,18 +1,23 @@
 <template>
   <view class="detail-page">
-    <!-- 顶部图片 -->
+    <!-- 顶部图片轮播 -->
     <view class="image-area">
-      <su-image
-        :src="dish.coverUrl || '/static/logo.png'"
-        width="100%"
-        height="500rpx"
-        borderRadius="0"
+      <su-swiper
+        :list="dishImages"
+        dotStyle="tag"
+        :autoplay="true"
+        :interval="4000"
+        :height="500"
+        imageMode="aspectFill"
       />
     </view>
 
     <!-- 菜品信息 -->
     <view class="dish-section">
-      <text class="dish-title">{{ dish.name }}</text>
+      <view class="dish-title-row">
+        <text class="dish-title">{{ dish.name }}</text>
+        <text class="dish-tag tag-sold" v-if="dish.isSoldOut">沽清</text>
+      </view>
       <text class="dish-sub" v-if="dish.subtitle">{{ dish.subtitle }}</text>
       <view class="dish-meta">
         <text class="dish-price-main">¥{{ totalPrice }}</text>
@@ -74,7 +79,9 @@
         <text class="qty-num">{{ quantity }}</text>
         <view class="qty-btn" @click="quantity++">+</view>
       </view>
-      <view class="submit-btn" @click="addToCart">加入购物车 ¥{{ totalPrice * quantity }}</view>
+      <view class="submit-btn" :class="{ disabled: dish.isSoldOut }" @click="addToCart">
+        {{ dish.isSoldOut ? '已沽清' : '加入购物车 ¥' + (totalPrice * quantity) }}
+      </view>
     </view>
   </view>
 </template>
@@ -100,11 +107,15 @@ const totalPrice = computed(() => {
   } else if (dish.value.minPrice) {
     price = dish.value.minPrice;
   }
-  // 加料价格
   selectedAddons.value.forEach((a) => {
     price += a.extraPrice || 0;
   });
   return price;
+});
+
+const dishImages = computed(() => {
+  if (!dish.value.coverUrl) return [{ type: 'image', src: '/static/logo.png' }];
+  return [{ type: 'image', src: dish.value.coverUrl }];
 });
 
 onLoad((options) => {
@@ -146,6 +157,7 @@ function toggleAddon(opt, isMulti) {
 }
 
 function addToCart() {
+  if (dish.value.isSoldOut) return;
   // 校验必选加料
   for (const group of (dish.value.addons || [])) {
     if (group.isRequired) {
@@ -196,10 +208,28 @@ function addToCart() {
   margin-bottom: 16rpx;
 }
 
+.dish-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .dish-title {
   font-size: 36rpx;
   font-weight: bold;
   color: $dark-3;
+}
+
+.dish-tag {
+  font-size: 18rpx;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+  line-height: 1.4;
+
+  &.tag-sold {
+    color: $dark-9;
+    border: 1rpx solid $dark-9;
+  }
 }
 
 .dish-sub {
@@ -335,5 +365,9 @@ function addToCart() {
   border-radius: 40rpx;
   font-size: 28rpx;
   font-weight: bold;
+
+  &.disabled {
+    background: #ccc;
+  }
 }
 </style>

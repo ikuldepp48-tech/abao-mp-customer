@@ -2,71 +2,66 @@
   <view class="menu-page">
     <!-- 顶部门店信息 -->
     <view class="menu-header">
-      <view class="header-top">
-        <text class="store-name" v-if="storeName">{{ storeName }}</text>
+      <view class="header-left">
+        <text class="store-name">{{ storeName || '阿堡' }}</text>
         <text class="table-info" v-if="tableLabel">{{ tableLabel }}</text>
-        <text class="store-name" v-else>阿堡</text>
       </view>
-      <!-- Banner 轮播 -->
-      <view class="banner-area" v-if="banners.length">
-        <su-swiper
-          :list="banners"
-          dotStyle="tag"
-          :autoplay="true"
-          :interval="3000"
-          :height="280"
-          imageMode="aspectFill"
-        />
+      <view class="header-right">
+        <text class="search-icon">&#x2315;</text>
       </view>
     </view>
 
-    <!-- 主体：横向分类 tabs（sticky） + 菜品列表 -->
-    <view class="menu-body" v-if="!loading">
-      <!-- 横向分类 tabs（吸顶） -->
-      <su-sticky>
-        <su-tabs
-          :list="tabList"
-          :current="activeCategory"
-          :scrollable="true"
-          :activeStyle="{ color: '#D4351C', fontWeight: 'bold' }"
-          :inactiveStyle="{ color: '#666666' }"
-          lineColor="#D4351C"
-          :lineWidth="20"
-          :lineHeight="3"
-          @change="onTabChange"
-        />
-      </su-sticky>
+    <!-- Banner 轮播 -->
+    <view class="banner-area" v-if="banners.length">
+      <su-swiper
+        :list="banners"
+        dotStyle="tag"
+        :autoplay="true"
+        :interval="3000"
+        :height="240"
+        imageMode="aspectFill"
+      />
+    </view>
 
-      <!-- 菜品列表 -->
+    <!-- 主体：左侧分类 + 右侧菜品 -->
+    <view class="menu-body" v-if="!loading">
+      <!-- 左侧分类列 -->
+      <scroll-view class="sidebar" scroll-y>
+        <view
+          v-for="(cat, idx) in flatCategories"
+          :key="idx"
+          class="sidebar-item"
+          :class="{ active: activeCategory === idx }"
+          @click="switchCategory(idx)"
+        >
+          <view class="sidebar-bar" v-if="activeCategory === idx" />
+          <text class="sidebar-name">{{ cat.name }}</text>
+        </view>
+      </scroll-view>
+
+      <!-- 右侧菜品列表 -->
       <scroll-view
-        class="dish-list"
+        class="dish-scroll"
         scroll-y
         :scroll-into-view="scrollToId"
         @scroll="onDishScroll"
+        :scroll-with-animation="true"
       >
-        <view v-for="(cat, catIdx) in flatCategories" :key="'cat-' + catIdx" :id="'cat-' + catIdx">
-          <view class="category-title">{{ cat._parentName ? cat._parentName + ' · ' : '' }}{{ cat.name }}</view>
-          <view
-            v-for="(dish, dishIdx) in (cat.dishes || [])"
-            :key="'dish-' + dishIdx"
-            class="dish-card"
-            @click="goDetail(dish)"
-          >
-            <su-image
-              :src="dish.coverUrl || '/static/logo.png'"
-              :width="160"
-              :height="160"
-              borderRadius="12rpx"
-            />
-            <view class="dish-info">
-              <text class="dish-name">{{ dish.name }}</text>
-              <text class="dish-desc" v-if="dish.subtitle">{{ dish.subtitle }}</text>
-              <view class="dish-price-row">
-                <text class="dish-price">¥{{ dish.minPrice }}</text>
-                <view class="dish-add-btn" @click.stop="quickAdd(dish)">+</view>
-              </view>
-            </view>
+        <view
+          v-for="(cat, catIdx) in flatCategories"
+          :key="'sec-' + catIdx"
+          class="cat-section"
+          :id="'cat-' + catIdx"
+        >
+          <view class="category-title">
+            {{ cat._parentName ? cat._parentName + ' · ' : '' }}{{ cat.name }}
           </view>
+          <DishCard
+            v-for="dish in cat.dishes"
+            :key="dish.spuId"
+            :dish="dish"
+            @add="quickAdd"
+          />
         </view>
         <view class="bottom-placeholder" />
       </scroll-view>
@@ -81,7 +76,7 @@
     <view class="cart-bar" @click="showCartPopup = true">
       <view class="cart-left">
         <view class="cart-icon" :class="{ 'has-items': cartStore.totalItems > 0 }">
-          <text class="cicon-cart cart-icon-font" />
+          <text class="cart-icon-text">&#x1F6D2;</text>
           <text class="cart-badge" v-if="cartStore.totalItems > 0">{{ cartStore.totalItems }}</text>
         </view>
         <text class="cart-total" v-if="cartStore.totalItems > 0">¥{{ cartStore.totalPrice.toFixed(2) }}</text>
@@ -128,9 +123,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { onLoad, onShow, onHide } from '@dcloudio/uni-app';
+import { ref, computed, nextTick } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
+import DishCard from './components/DishCard.vue';
 
 const menuStore = sheep.$store('menu');
 const storeStore = sheep.$store('store');
@@ -143,17 +139,17 @@ const combos = ref([]);
 const activeCategory = ref(0);
 const scrollToId = ref('');
 const showCartPopup = ref(false);
+const sectionTops = ref([]); // 各分类区域的偏移量（用于滚动联动）
 
 const storeName = computed(() => storeStore.storeName);
 const tableLabel = computed(() => tableStore.tableLabel);
 
-// Banner 数据（静态占位，后续接入后端 API）
 const banners = ref([
   { type: 'image', src: '/static/logo.png' },
   { type: 'image', src: '/static/logo.png' },
 ]);
 
-// 展平分类树：父分类有子分类时展开子分类，只显示有菜品的分类
+// 展平分类树
 const flatCategories = computed(() => {
   const result = [];
   for (const cat of categories.value) {
@@ -170,11 +166,6 @@ const flatCategories = computed(() => {
   return result;
 });
 
-// su-tabs 的 list 数据格式
-const tabList = computed(() =>
-  flatCategories.value.map((cat) => ({ name: cat.name }))
-);
-
 onLoad(async () => {
   const storeId = storeStore.storeId || 3;
   const data = await menuStore.fetchMenu(storeId);
@@ -183,29 +174,40 @@ onLoad(async () => {
     combos.value = data.combos || [];
   }
   loading.value = false;
+  // 等 DOM 渲染后计算各分类区域位置
+  await nextTick();
+  setTimeout(() => calcSectionTops(), 300);
 });
 
-onShow(() => {
-  // 不再隐藏 tabBar，底部导航栏始终可见
-});
+function calcSectionTops() {
+  const query = uni.createSelectorQuery();
+  query.selectAll('.cat-section').boundingClientRect((rects) => {
+    if (rects && rects.length) {
+      sectionTops.value = rects.map(r => r.top);
+    }
+  }).exec();
+}
 
-onHide(() => {
-  // 不再需要恢复 tabBar
-});
-
-function onTabChange(e) {
-  const idx = e.index;
-  activeCategory.value = idx;
-  scrollToId.value = 'cat-' + idx;
+function onDishScroll(e) {
+  const st = e.detail.scrollTop;
+  const tops = sectionTops.value;
+  if (!tops.length) return;
+  let active = 0;
+  for (let i = 0; i < tops.length; i++) {
+    if (tops[i] <= st + 60) {
+      active = i;
+    } else {
+      break;
+    }
+  }
+  if (active !== activeCategory.value) {
+    activeCategory.value = active;
+  }
 }
 
 function switchCategory(idx) {
   activeCategory.value = idx;
   scrollToId.value = 'cat-' + idx;
-}
-
-function onDishScroll(e) {
-  // 暂不实现自动高亮
 }
 
 function goDetail(dish) {
@@ -248,15 +250,22 @@ function handleClearCart() {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: $bg-page;
+  background: #f6f6f6;
 }
 
+/* 顶部 */
 .menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 30rpx;
   background: #fff;
 }
 
-.header-top {
-  padding: 20rpx 30rpx;
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 16rpx;
 }
 
 .store-name {
@@ -268,23 +277,74 @@ function handleClearCart() {
 .table-info {
   font-size: 24rpx;
   color: $red;
-  margin-left: 16rpx;
+}
+
+.search-icon {
+  font-size: 40rpx;
+  color: $dark-6;
 }
 
 .banner-area {
-  padding: 0 20rpx 16rpx;
+  padding: 0 20rpx 12rpx;
+  background: #fff;
 }
 
+/* 主体：flex 横向 */
 .menu-body {
   display: flex;
-  flex-direction: column;
   flex: 1;
   overflow: hidden;
 }
 
-.dish-list {
+/* 左侧分类列 */
+.sidebar {
+  width: 180rpx;
+  background: #f8f8f8;
+  flex-shrink: 0;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 20rpx;
+  position: relative;
+
+  &.active {
+    background: #fff;
+
+    .sidebar-name {
+      color: $red;
+      font-weight: bold;
+    }
+  }
+}
+
+.sidebar-bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4rpx;
+  height: 32rpx;
+  background: $red;
+  border-radius: 0 3rpx 3rpx 0;
+}
+
+.sidebar-name {
+  font-size: 26rpx;
+  color: $dark-6;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+/* 右侧菜品列表 */
+.dish-scroll {
   flex: 1;
   padding: 0 20rpx;
+}
+
+.cat-section {
+  // 用于 selectorQuery 定位
 }
 
 .category-title {
@@ -294,61 +354,11 @@ function handleClearCart() {
   color: $dark-3;
 }
 
-.dish-card {
-  display: flex;
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 20rpx;
-  margin-bottom: 16rpx;
-}
-
-.dish-info {
-  flex: 1;
-  margin-left: 20rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.dish-name {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: $dark-3;
-}
-
-.dish-desc {
-  font-size: 22rpx;
-  color: $dark-9;
-  margin-top: 4rpx;
-}
-
-.dish-price-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dish-price {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: $red;
-}
-
-.dish-add-btn {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  background: $red;
-  color: #fff;
-  font-size: 32rpx;
-  line-height: 48rpx;
-  text-align: center;
-}
-
 .bottom-placeholder {
   height: 140rpx;
 }
 
+/* 加载中 */
 .loading-view {
   flex: 1;
   display: flex;
@@ -374,24 +384,6 @@ function handleClearCart() {
   z-index: 100;
 }
 
-.cart-total {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: $red;
-}
-
-.cart-submit-btn {
-  padding: 16rpx 40rpx;
-  background: $red;
-  color: #fff;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-
-  &.disabled {
-    background: #ccc;
-  }
-}
-
 .cart-left {
   display: flex;
   align-items: center;
@@ -413,9 +405,8 @@ function handleClearCart() {
   }
 }
 
-.cart-icon-font {
+.cart-icon-text {
   font-size: 36rpx;
-  color: #fff;
 }
 
 .cart-badge {
@@ -433,9 +424,27 @@ function handleClearCart() {
   border: 2rpx solid $red;
 }
 
+.cart-total {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: $red;
+}
+
 .cart-empty {
   font-size: 26rpx;
   color: $dark-9;
+}
+
+.cart-submit-btn {
+  padding: 16rpx 40rpx;
+  background: $red;
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+
+  &.disabled {
+    background: #ccc;
+  }
 }
 
 /* 购物车弹窗 */
@@ -516,7 +525,7 @@ function handleClearCart() {
   gap: 12rpx;
 }
 
-.qty-ctrl .qty-btn {
+.qty-btn {
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
@@ -526,7 +535,7 @@ function handleClearCart() {
   font-size: 28rpx;
 }
 
-.qty-ctrl .qty-num {
+.qty-num {
   font-size: 28rpx;
   min-width: 36rpx;
   text-align: center;
