@@ -79,7 +79,7 @@
         <text class="qty-num">{{ quantity }}</text>
         <view class="qty-btn" @click="quantity++">+</view>
       </view>
-      <view class="submit-btn" :class="{ disabled: dish.isSoldOut }" @click="addToCart">
+      <view class="submit-btn" :class="{ disabled: !canSubmit }" @click="addToCart">
         {{ dish.isSoldOut ? '已沽清' : '加入购物车 ¥' + (totalPrice * quantity) }}
       </view>
     </view>
@@ -111,6 +111,17 @@ const totalPrice = computed(() => {
     price += a.extraPrice || 0;
   });
   return price;
+});
+
+const canSubmit = computed(() => {
+  if (dish.value.isSoldOut) return false;
+  for (const group of (dish.value.addons || [])) {
+    if (group.isRequired) {
+      const has = selectedAddons.value.some((a) => a.groupName === group.groupName);
+      if (!has) return false;
+    }
+  }
+  return true;
 });
 
 const dishImages = computed(() => {

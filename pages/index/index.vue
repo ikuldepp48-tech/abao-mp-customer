@@ -3,11 +3,9 @@
     <!-- 顶部门店信息 -->
     <view class="menu-header">
       <view class="header-left">
+        <image class="header-logo" src="/static/logo.png" mode="aspectFit" />
         <text class="store-name">{{ storeName || '阿堡' }}</text>
         <text class="table-info" v-if="tableLabel">{{ tableLabel }}</text>
-      </view>
-      <view class="header-right">
-        <text class="search-icon">&#x2315;</text>
       </view>
     </view>
 
@@ -253,7 +251,13 @@ function goOrder() {
 }
 
 function handleClearCart() {
-  cartStore.clearLocalCart();
+  uni.showModal({
+    title: '清空购物车',
+    content: '确定要清空购物车吗？',
+    success: (res) => {
+      if (res.confirm) cartStore.clearLocalCart();
+    },
+  });
 }
 </script>
 
@@ -276,8 +280,14 @@ function handleClearCart() {
 
 .header-left {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 16rpx;
+}
+
+.header-logo {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
 }
 
 .store-name {
@@ -289,11 +299,6 @@ function handleClearCart() {
 .table-info {
   font-size: 24rpx;
   color: $red;
-}
-
-.search-icon {
-  font-size: 40rpx;
-  color: $dark-6;
 }
 
 .banner-area {

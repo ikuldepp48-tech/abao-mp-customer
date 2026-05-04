@@ -68,7 +68,7 @@
 
       <view class="modal-footer">
         <text class="footer-price">¥{{ (totalPrice * quantity).toFixed(2) }}</text>
-        <view class="footer-btn" @click="handleConfirm">加入购物车</view>
+        <view class="footer-btn" :class="{ disabled: !canSubmit }" @click="handleConfirm">加入购物车</view>
       </view>
     </view>
   </su-popup>
@@ -103,6 +103,16 @@ const totalPrice = computed(() => {
     price += a.extraPrice || 0;
   });
   return price;
+});
+
+const canSubmit = computed(() => {
+  for (const group of (props.dish.addons || [])) {
+    if (group.isRequired) {
+      const has = selectedAddons.value.some((a) => a.groupName === group.groupName);
+      if (!has) return false;
+    }
+  }
+  return true;
 });
 
 // 弹窗打开时重置状态
@@ -314,5 +324,9 @@ function handleClose() {
   border-radius: 40rpx;
   font-size: 28rpx;
   font-weight: bold;
+
+  &.disabled {
+    background: #ccc;
+  }
 }
 </style>

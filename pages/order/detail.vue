@@ -7,17 +7,25 @@
     </view>
 
     <!-- 进度条 -->
-    <view class="progress-bar">
+    <view class="progress-bar" v-if="state.orderInfo.status !== 5">
       <view
         v-for="(step, idx) in steps"
         :key="idx"
         class="progress-step"
-        :class="{ active: idx <= currentStep, last: idx === steps.length - 1 }"
+        :class="{
+          passed: idx < currentStep,
+          current: idx === currentStep,
+          future: idx > currentStep
+        }"
       >
         <view class="step-dot" />
         <view class="step-line" v-if="idx < steps.length - 1" />
         <text class="step-label">{{ step }}</text>
       </view>
+    </view>
+    <view class="cancelled-bar" v-else>
+      <view class="cancelled-dot" />
+      <text class="cancelled-text">订单已取消</text>
     </view>
 
     <!-- 订单商品 -->
@@ -57,15 +65,11 @@
     <!-- 金额信息 -->
     <view class="price-card ss-m-20">
       <view class="price-row">
-        <text class="price-label">商品金额</text>
+        <text class="price-label">原价</text>
         <text class="price-value">¥{{ (state.orderInfo.originalAmount || 0).toFixed(2) }}</text>
       </view>
-      <view class="price-row" v-if="state.orderInfo.discountAmount > 0">
-        <text class="price-label">优惠金额</text>
-        <text class="price-value price-red">-¥{{ (state.orderInfo.discountAmount || 0).toFixed(2) }}</text>
-      </view>
       <view class="price-row price-total">
-        <text class="price-label">实付金额</text>
+        <text class="price-label">实付</text>
         <text class="price-value price-red price-big">¥{{ (state.orderInfo.payAmount || 0).toFixed(2) }}</text>
       </view>
     </view>
@@ -222,10 +226,6 @@ onLoad((options) => {
   z-index: 1;
 }
 
-.progress-step.active .step-dot {
-  background: $red;
-}
-
 .step-line {
   position: absolute;
   top: 12rpx;
@@ -236,19 +236,57 @@ onLoad((options) => {
   z-index: 0;
 }
 
-.progress-step.active .step-line {
+/* 已过：绿色 */
+.progress-step.passed .step-dot {
+  background: #07c160;
+}
+.progress-step.passed .step-line {
+  background: #07c160;
+}
+.progress-step.passed .step-label {
+  color: #07c160;
+}
+
+/* 当前：红色 */
+.progress-step.current .step-dot {
   background: $red;
 }
-
-.step-label {
-  font-size: 20rpx;
-  color: #bbb;
-  margin-top: 10rpx;
-}
-
-.progress-step.active .step-label {
+.progress-step.current .step-label {
   color: $red;
   font-weight: 500;
+}
+
+/* 未来：灰色 */
+.progress-step.future .step-dot {
+  background: #ddd;
+}
+.progress-step.future .step-line {
+  background: #ddd;
+}
+.progress-step.future .step-label {
+  color: #bbb;
+}
+
+/* 已取消 */
+.cancelled-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 30rpx 40rpx;
+}
+
+.cancelled-dot {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: $dark-9;
+}
+
+.cancelled-text {
+  font-size: 24rpx;
+  color: $dark-9;
+  margin-top: 10rpx;
 }
 
 .detail-card {
