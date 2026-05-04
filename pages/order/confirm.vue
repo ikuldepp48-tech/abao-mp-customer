@@ -84,6 +84,7 @@
 import { ref, computed } from 'vue';
 import sheep from '@/sheep';
 import OrderApi from '@/sheep/api/restaurant/restaurant_order';
+import PayOrderApi from '@/sheep/api/pay/order';
 
 const storeStore = sheep.$store('store');
 const tableStore = sheep.$store('table');
@@ -127,6 +128,7 @@ async function onSubmit() {
       customerRemark: item.remark || '',
     }));
 
+    // 1. 创建订单
     const { code, data } = await OrderApi.createOrder({
       storeId: storeStore.storeId,
       tableId: tableStore.tableId || 0,
@@ -137,10 +139,49 @@ async function onSubmit() {
       clientOrderNo: genClientOrderNo(),
     });
 
-    if (code === 0 && data) {
-      cartStore.clearLocalCart();
-      uni.redirectTo({ url: '/pages/order/detail?id=' + data.id });
+    if (code !== 0 || !data) return;
+
+    cartStore.clearLocalCart();
+
+    // 2. 发起微信小程序支付
+    if (data.payOrderId) {
+      try {
+        const openid = await sheep.$platform.useProvider('wechat').getOpenid(true);
+        if (openid) {
+          const payRes = await PayOrderApi.submitOrder({
+            id: data.payOrderId,
+            channelCode: 'wx_lite',
+            channelExtras: { openid },
+          });
+          if (payRes.code === 0 && payRes.data) {
+            const payConfig = JSON.parse(payRes.data.displayContent);
+            uni.requestPayment({
+              provider: 'wxpay',
+              timeStamp: payConfig.timeStamp,
+              nonceStr: payConfig.nonceStr,
+              package: payConfig.packageValue,
+              signType: payConfig.signType,
+              paySign: payConfig.paySign,
+              success: () => {
+                sheep.$router.redirect('/pages/order/detail', { id: data.id });
+              },
+              fail: (err) => {
+                if (err.errMsg !== 'requestPayment:fail cancel') {
+                  console.error('pay fail:', err);
+                }
+                sheep.$router.redirect('/pages/order/detail', { id: data.id });
+              },
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('pay error:', e);
+      }
     }
+
+    // 支付未发起，直接跳订单详情
+    sheep.$router.redirect('/pages/order/detail', { id: data.id });
   } catch (e) {
     console.error('submit order error:', e);
   } finally {

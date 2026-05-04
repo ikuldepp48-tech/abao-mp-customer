@@ -103,10 +103,11 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, onUnmounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
 import OrderApi from '@/sheep/api/restaurant/restaurant_order';
+import PayOrderApi from '@/sheep/api/pay/order';
 
 const steps = ['待支付', '已支付', '备餐中', '已出餐', '已完成'];
 
@@ -169,8 +170,64 @@ function onCancel() {
   });
 }
 
-function onPay() {
-  sheep.$helper.toast('请到收银台付款');
+let pollTimer = null;
+
+async function onPay() {
+  if (!state.orderInfo.payOrderId) {
+    sheep.$helper.toast('支付单未创建');
+    return;
+  }
+  try {
+    const openid = await sheep.$platform.useProvider('wechat').getOpenid(true);
+    if (!openid) {
+      sheep.$helper.toast('获取用户信息失败，请重试');
+      return;
+    }
+    const payRes = await PayOrderApi.submitOrder({
+      id: state.orderInfo.payOrderId,
+      channelCode: 'wx_lite',
+      channelExtras: { openid },
+    });
+    if (payRes.code === 0 && payRes.data) {
+      const payConfig = JSON.parse(payRes.data.displayContent);
+      uni.requestPayment({
+        provider: 'wxpay',
+        timeStamp: payConfig.timeStamp,
+        nonceStr: payConfig.nonceStr,
+        package: payConfig.packageValue,
+        signType: payConfig.signType,
+        paySign: payConfig.paySign,
+        success: () => {
+          getOrderDetail(state.orderInfo.id);
+        },
+        fail: (err) => {
+          if (err.errMsg !== 'requestPayment:fail cancel') {
+            console.error('pay fail:', err);
+          }
+        },
+      });
+    }
+  } catch (e) {
+    console.error('pay error:', e);
+    sheep.$helper.toast('支付失败，请重试');
+  }
+}
+
+function startPayPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    if (!state.orderInfo.payOrderId) return;
+    const payRes = await PayOrderApi.getOrder(state.orderInfo.payOrderId, false);
+    if (payRes.code === 0 && payRes.data) {
+      const payStatus = payRes.data.status;
+      // 支付成功或已退款，刷新订单详情
+      if (payStatus === 20 || payStatus === 30) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        await getOrderDetail(state.orderInfo.id);
+      }
+    }
+  }, 3000);
 }
 
 function onBackHome() {
@@ -180,7 +237,19 @@ function onBackHome() {
 onLoad((options) => {
   if (options.id) {
     state.orderInfo.id = options.id;
-    getOrderDetail(options.id);
+    getOrderDetail(options.id).then(() => {
+      // 订单待支付时，启动轮询
+      if (state.orderInfo.status === 0 && state.orderInfo.payOrderId) {
+        startPayPolling();
+      }
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
   }
 });
 </script>
