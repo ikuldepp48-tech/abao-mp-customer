@@ -1,6 +1,6 @@
 <!-- 商品分类列表 -->
 <template>
-  <s-layout :bgStyle="{ color: '#fff' }" tabbar="/pages/index/category" title="分类">
+  <s-layout :bgStyle="{ color: '#fff' }" title="分类">
     <view class="s-category">
       <view class="three-level-wrap ss-flex ss-col-top">
         <!-- 商品分类（左） -->
@@ -50,6 +50,7 @@
         </view>
       </view>
     </view>
+    <AbaoTabBar />
   </s-layout>
 </template>
 
@@ -64,6 +65,7 @@
   import { computed, reactive } from 'vue';
   import { concat } from 'lodash-es';
   import { handleTree } from '@/sheep/helper/utils';
+  import AbaoTabBar from '@/components/abao/AbaoTabBar.vue';
 
   const state = reactive({
     style: 'second_one', // first_one（一级 - 样式一）, first_two（二级 - 样式二）, second_one（二级）

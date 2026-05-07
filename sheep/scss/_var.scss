@@ -1,7 +1,16 @@
 @import './mixins';
 
 //颜色 ，渐变背景60%
-$red: #D4351C;      // 阿堡红
+// 阿堡品牌色系（OKLCH → HEX）
+$red: #D4351C;                // 阿堡红 --abao-red
+$abao-red-deep: #A62812;      // 深红 --abao-red-deep
+$abao-red-soft: #F5E8E5;      // 浅红 --abao-red-soft
+$abao-red-ink: #7A1A0D;       // 印泥红 --abao-red-ink
+$abao-yellow: #F5C542;        // 铭黄 --abao-yellow
+$abao-yellow-soft: #FBF3D9;   // 浅黄 --abao-yellow-soft
+$abao-yellow-deep: #D19E1C;   // 深黄 --abao-yellow-deep
+$abao-cream: #FBF9F5;         // 奶油 --abao-cream
+$abao-paper: #F9F6F2;         // 纸色 --abao-paper
 $orange: #f37b1d;   // 桔橙
 $gold: #fbbd08;     // 明黄
 $green: #8dc63f;    // 橄榄绿
@@ -101,6 +110,11 @@ $radius: 10rpx !default; // 默认圆角大小
 $radius-lg: 40rpx !default; // 大圆角
 $radius-sm: 6rpx !default; // 小圆角
 $round-pill: 1000rpx !default; // 半圆
+// 阿堡品牌圆角（设计系统）
+$r-sm: 16rpx;
+$r-md: 40rpx;
+$r-lg: 60rpx;
+$r-xl: 80rpx;
 
 // 动画过渡
 $transition-base: all 0.2s ease-in-out !default; // 默认过渡
@@ -124,6 +138,9 @@ $spacers: map-merge(
   $spacers
 );
 // 字形
+$font-display: "Songti SC", "STSong", serif; // 阿堡展示字体（对标 Noto Serif SC）
+$font-body: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif; // 阿堡正文字体
+$font-num: "Helvetica Neue", system-ui; // 阿堡数字字体
 $font-weight-lighter: lighter !default;
 $font-weight-light: 300 !default;
 $font-weight-normal: 400 !default;

@@ -1,7 +1,10 @@
 <template>
-  <s-layout title="确认订单">
+  <view class="confirm-page">
+    <!-- 顶部导航 -->
+    <AbaoNavBar title="确认订单" :showBack="true" />
+
     <!-- 门店+桌台信息 -->
-    <view class="place-card ss-m-20">
+    <AbaoCard class="place-card">
       <view class="place-row">
         <text class="place-label">门店</text>
         <text class="place-value">{{ storeStore.storeName || '阿堡' }}</text>
@@ -18,10 +21,10 @@
           <view class="diner-btn" @click="dinerCount < 12 && dinerCount++">+</view>
         </view>
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 订单明细 -->
-    <view class="order-card ss-m-20">
+    <AbaoCard class="order-card">
       <view class="order-item" v-for="item in cartStore.localItems" :key="item.cartItemId">
         <view class="item-main">
           <text class="item-name">{{ item.spuName }}</text>
@@ -47,10 +50,10 @@
           :clearable="false"
         />
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 金额汇总 -->
-    <view class="price-card ss-m-20">
+    <AbaoCard class="price-card">
       <view class="price-row">
         <text class="price-label">商品金额</text>
         <text class="price-value">¥{{ totalAmount.toFixed(2) }}</text>
@@ -63,26 +66,26 @@
         <text class="price-label">实付金额</text>
         <text class="price-value price-red price-big">¥{{ payAmount.toFixed(2) }}</text>
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 底部提交 -->
-    <su-fixed bottom placeholder bg="bg-white">
-      <view class="footer-box">
-        <view class="footer-left">
-          <text class="footer-label">合计：</text>
-          <text class="footer-price">¥{{ payAmount.toFixed(2) }}</text>
-        </view>
-        <button class="submit-btn" :disabled="submitting" @tap="onSubmit">
-          {{ submitting ? '提交中...' : '提交订单' }}
-        </button>
+    <view class="footer-box">
+      <view class="footer-left">
+        <text class="footer-label">合计：</text>
+        <text class="footer-price">¥{{ payAmount.toFixed(2) }}</text>
       </view>
-    </su-fixed>
-  </s-layout>
+      <button class="submit-btn" :disabled="submitting" @tap="onSubmit">
+        {{ submitting ? '提交中...' : '提交订单' }}
+      </button>
+    </view>
+  </view>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import sheep from '@/sheep';
+import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
+import AbaoCard from '@/components/abao/AbaoCard.vue';
 import OrderApi from '@/sheep/api/restaurant/restaurant_order';
 import PayOrderApi from '@/sheep/api/pay/order';
 
@@ -191,10 +194,14 @@ async function onSubmit() {
 </script>
 
 <style lang="scss" scoped>
+.confirm-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 120rpx;
+}
+
 .place-card {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx 24rpx;
+  margin: 16rpx;
 }
 
 .place-row {
@@ -204,19 +211,19 @@ async function onSubmit() {
   padding: 16rpx 0;
 
   &:not(:last-child) {
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 0.5px solid var(--ink-100);
   }
 }
 
 .place-label {
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .place-value {
   font-size: 28rpx;
-  font-weight: 500;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
 }
 
 .diner-picker {
@@ -229,24 +236,24 @@ async function onSubmit() {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  border: 1rpx solid #ddd;
-  text-align: center;
-  line-height: 48rpx;
+  border: 1px solid var(--ink-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 28rpx;
-  color: $dark-6;
+  color: var(--ink-700);
 }
 
 .diner-num {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 700;
   min-width: 48rpx;
   text-align: center;
+  color: var(--ink-900);
 }
 
 .order-card {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx 24rpx;
+  margin: 0 16rpx 16rpx;
 }
 
 .order-item {
@@ -256,7 +263,7 @@ async function onSubmit() {
   padding: 16rpx 0;
 
   &:not(:last-child) {
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 0.5px solid var(--ink-100);
   }
 }
 
@@ -266,19 +273,19 @@ async function onSubmit() {
 
 .item-name {
   font-size: 28rpx;
-  font-weight: 500;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
 }
 
 .item-sku {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-500);
   margin-left: 8rpx;
 }
 
 .item-addons {
   font-size: 22rpx;
-  color: $dark-a;
+  color: var(--ink-300);
   display: block;
   margin-top: 4rpx;
 }
@@ -290,13 +297,14 @@ async function onSubmit() {
 
 .item-price {
   font-size: 28rpx;
-  font-weight: 500;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
+  font-family: var(--font-num);
 }
 
 .item-qty {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-500);
   display: block;
   margin-top: 4rpx;
 }
@@ -305,13 +313,13 @@ async function onSubmit() {
   display: flex;
   align-items: center;
   padding-top: 20rpx;
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 0.5px solid var(--ink-100);
   margin-top: 10rpx;
 }
 
 .remark-label {
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-500);
   width: 80rpx;
 }
 
@@ -324,13 +332,12 @@ async function onSubmit() {
     font-size: 26rpx;
     text-align: right !important;
     padding-right: 0 !important;
+    color: var(--ink-900);
   }
 }
 
 .price-card {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx 24rpx;
+  margin: 0 16rpx 16rpx;
 }
 
 .price-row {
@@ -342,35 +349,44 @@ async function onSubmit() {
 
 .price-label {
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .price-value {
   font-size: 28rpx;
-  color: $dark-3;
+  color: var(--ink-900);
+  font-family: var(--font-num);
 }
 
 .price-red {
-  color: $red;
+  color: var(--abao-red);
 }
 
 .price-big {
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .price-total {
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 0.5px solid var(--ink-100);
   margin-top: 8rpx;
   padding-top: 16rpx;
 }
 
 .footer-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 30rpx;
   height: 100rpx;
+  background: #fff;
+  border-top: 0.5px solid var(--ink-200);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
 }
 
 .footer-left {
@@ -380,28 +396,31 @@ async function onSubmit() {
 
 .footer-label {
   font-size: 28rpx;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .footer-price {
   font-size: 36rpx;
-  font-weight: bold;
-  color: $red;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .submit-btn {
   width: 220rpx;
   height: 72rpx;
-  background: $red;
+  background: var(--abao-red);
   color: #fff;
-  border-radius: 36rpx;
+  border-radius: var(--r-pill);
   font-size: 28rpx;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 72rpx;
   border: none;
+  box-shadow: var(--shadow-red);
 
   &[disabled] {
-    background: #ccc;
+    background: var(--ink-300);
+    box-shadow: none;
   }
 }
 </style>

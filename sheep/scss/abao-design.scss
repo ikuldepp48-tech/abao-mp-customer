@@ -1,0 +1,50 @@
+/* ============================================
+   阿堡 ABAO 品牌设计系统
+   来源：/Users/mac/Downloads/阿堡小程序/design-system.css
+   OKLCH → HEX 转换（uniApp 不支持 oklch()）
+   ============================================ */
+
+/* ===== 品牌色 ===== */
+page {
+  --abao-red: #D4351C;
+  --abao-red-deep: #A62812;
+  --abao-red-soft: #F5E8E5;
+  --abao-red-ink: #7A1A0D;
+  --abao-yellow: #F5C542;
+  --abao-yellow-soft: #FBF3D9;
+  --abao-yellow-deep: #D19E1C;
+  --abao-cream: #FBF9F5;
+  --abao-paper: #F9F6F2;
+
+  /* 暖色调中性色 */
+  --ink-900: #2D2A28;
+  --ink-700: #504B48;
+  --ink-500: #827C78;
+  --ink-300: #C6C0BC;
+  --ink-200: #DFDCD8;
+  --ink-100: #EFEDEB;
+  --bg: #FBFAF8;
+
+  /* 辅助色 */
+  --accent-mint: #9ED6C9;
+  --accent-blush: #E8D4D4;
+  --accent-sky: #9DC8E0;
+
+  /* 圆角系统 */
+  --r-sm: 8px;
+  --r-md: 20px;
+  --r-lg: 30px;
+  --r-xl: 40px;
+  --r-pill: 999px;
+
+  /* 阴影系统 */
+  --shadow-sm: 0 1px 2px rgba(20,10,5,.05), 0 2px 6px rgba(20,10,5,.04);
+  --shadow-md: 0 4px 14px rgba(140,30,20,.08), 0 1px 3px rgba(20,10,5,.05);
+  --shadow-lg: 0 12px 32px rgba(140,30,20,.12), 0 4px 12px rgba(20,10,5,.06);
+  --shadow-red: 0 8px 24px rgba(196,40,30,.30);
+
+  /* 字体 */
+  --font-display: "Songti SC", "STSong", serif;
+  --font-body: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+  --font-num: "Helvetica Neue", system-ui;
+}

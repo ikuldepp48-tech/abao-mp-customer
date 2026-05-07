@@ -1,5 +1,8 @@
 <template>
   <view class="detail-page">
+    <!-- 顶部导航 -->
+    <AbaoNavBar title="商品详情" :showBack="true" />
+
     <!-- 顶部图片轮播 -->
     <view class="image-area">
       <su-swiper
@@ -13,19 +16,19 @@
     </view>
 
     <!-- 菜品信息 -->
-    <view class="dish-section">
+    <AbaoCard class="dish-section">
       <view class="dish-title-row">
         <text class="dish-title">{{ dish.name }}</text>
-        <text class="dish-tag tag-sold" v-if="dish.isSoldOut">沽清</text>
+        <AbaoChip v-if="dish.isSoldOut" text="沽清" variant="outline" />
       </view>
       <text class="dish-sub" v-if="dish.subtitle">{{ dish.subtitle }}</text>
       <view class="dish-meta">
         <text class="dish-price-main">¥{{ totalPrice }}</text>
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 规格选择 -->
-    <view class="option-section" v-if="dish.skus && dish.skus.length > 1">
+    <AbaoCard class="option-section" v-if="dish.skus && dish.skus.length > 1">
       <text class="option-title">规格</text>
       <view class="option-list">
         <view
@@ -39,13 +42,13 @@
           <text class="sku-price" v-if="sku.price">+¥{{ sku.price }}</text>
         </view>
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 加料选择 -->
-    <view class="option-section" v-for="group in (dish.addons || [])" :key="group.groupName">
+    <AbaoCard class="option-section" v-for="group in (dish.addons || [])" :key="group.groupName">
       <text class="option-title">
         {{ group.groupName }}
-        <text class="required-tag" v-if="group.isRequired">必选</text>
+        <AbaoChip v-if="group.isRequired" text="必选" variant="red" />
       </text>
       <view class="option-list">
         <view
@@ -59,10 +62,10 @@
           <text class="addon-price" v-if="opt.extraPrice">+¥{{ opt.extraPrice }}</text>
         </view>
       </view>
-    </view>
+    </AbaoCard>
 
     <!-- 备注 -->
-    <view class="remark-section">
+    <AbaoCard class="remark-section">
       <text class="option-title">备注</text>
       <input
         class="remark-input"
@@ -70,17 +73,17 @@
         v-model="remark"
         maxlength="50"
       />
-    </view>
+    </AbaoCard>
 
     <!-- 底部操作栏 -->
     <view class="bottom-bar">
       <view class="quantity-row">
-        <view class="qty-btn" @click="quantity > 1 && quantity--">-</view>
+        <view class="qty-btn" @click="quantity > 1 && quantity--">−</view>
         <text class="qty-num">{{ quantity }}</text>
         <view class="qty-btn" @click="quantity++">+</view>
       </view>
       <view class="submit-btn" :class="{ disabled: !canSubmit }" @click="addToCart">
-        {{ dish.isSoldOut ? '已沽清' : '加入购物车 ¥' + (totalPrice * quantity) }}
+        <text class="submit-text">{{ dish.isSoldOut ? '已沽清' : '加入购物车 ¥' + (totalPrice * quantity) }}</text>
       </view>
     </view>
   </view>
@@ -90,6 +93,9 @@
 import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
+import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
+import AbaoCard from '@/components/abao/AbaoCard.vue';
+import AbaoChip from '@/components/abao/AbaoChip.vue';
 
 const menuStore = sheep.$store('menu');
 const cartStore = sheep.$store('cart');
@@ -205,7 +211,7 @@ function addToCart() {
 <style lang="scss" scoped>
 .detail-page {
   min-height: 100vh;
-  background: #f6f6f6;
+  background: var(--bg);
   padding-bottom: 120rpx;
 }
 
@@ -214,9 +220,7 @@ function addToCart() {
 }
 
 .dish-section {
-  background: #fff;
-  padding: 30rpx;
-  margin-bottom: 16rpx;
+  margin: 16rpx;
 }
 
 .dish-title-row {
@@ -227,25 +231,14 @@ function addToCart() {
 
 .dish-title {
   font-size: 36rpx;
-  font-weight: bold;
-  color: $dark-3;
-}
-
-.dish-tag {
-  font-size: 18rpx;
-  padding: 2rpx 8rpx;
-  border-radius: 4rpx;
-  line-height: 1.4;
-
-  &.tag-sold {
-    color: $dark-9;
-    border: 1rpx solid $dark-9;
-  }
+  font-weight: 700;
+  color: var(--ink-900);
+  font-family: var(--font-display);
 }
 
 .dish-sub {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-500);
   margin-top: 8rpx;
   display: block;
 }
@@ -258,37 +251,23 @@ function addToCart() {
 
 .dish-price-main {
   font-size: 40rpx;
-  font-weight: bold;
-  color: $red;
-}
-
-.dish-sold {
-  font-size: 22rpx;
-  color: $dark-a;
-  margin-left: 20rpx;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .option-section {
-  background: #fff;
-  padding: 24rpx 30rpx;
-  margin-bottom: 2rpx;
+  margin: 0 16rpx 8rpx;
 }
 
 .option-title {
   font-size: 28rpx;
-  font-weight: bold;
-  color: $dark-3;
+  font-weight: 700;
+  color: var(--ink-900);
   margin-bottom: 16rpx;
-  display: block;
-}
-
-.required-tag {
-  font-size: 20rpx;
-  color: $red;
-  border: 1rpx solid $red;
-  border-radius: 4rpx;
-  padding: 2rpx 8rpx;
-  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .option-list {
@@ -299,38 +278,38 @@ function addToCart() {
 
 .option-tag {
   padding: 12rpx 24rpx;
-  border-radius: 8rpx;
-  border: 1rpx solid #ddd;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--ink-200);
   font-size: 26rpx;
-  color: $dark-6;
-  background: #fafafa;
+  color: var(--ink-700);
+  background: var(--ink-100);
 
   &.selected {
-    border-color: $red;
-    color: $red;
-    background: #fff5f5;
+    border-color: var(--abao-red);
+    color: var(--abao-red);
+    background: var(--abao-red-soft);
   }
 }
 
 .sku-price, .addon-price {
   font-size: 22rpx;
-  color: $red;
+  color: var(--abao-red);
   margin-left: 4rpx;
 }
 
 .remark-section {
-  background: #fff;
-  padding: 24rpx 30rpx;
-  margin-bottom: 16rpx;
+  margin: 0 16rpx 16rpx;
 }
 
 .remark-input {
   width: 100%;
   height: 60rpx;
-  border: 1rpx solid #eee;
-  border-radius: 8rpx;
+  border: 1px solid var(--ink-200);
+  border-radius: var(--r-sm);
   padding: 0 16rpx;
   font-size: 26rpx;
+  color: var(--ink-900);
+  background: var(--ink-100);
 }
 
 .bottom-bar {
@@ -343,7 +322,8 @@ function addToCart() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1rpx solid #eee;
+  border-top: 0.5px solid var(--ink-200);
+  box-shadow: var(--shadow-md);
 }
 
 .quantity-row {
@@ -356,29 +336,37 @@ function addToCart() {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  border: 1rpx solid #ddd;
-  text-align: center;
-  line-height: 48rpx;
+  border: 1px solid var(--ink-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 32rpx;
+  color: var(--ink-700);
 }
 
 .qty-num {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 700;
   min-width: 40rpx;
   text-align: center;
+  color: var(--ink-900);
 }
 
 .submit-btn {
   padding: 16rpx 48rpx;
-  background: $red;
-  color: #fff;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  font-weight: bold;
+  background: var(--abao-red);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-red);
 
   &.disabled {
-    background: #ccc;
+    background: var(--ink-300);
+    box-shadow: none;
   }
+}
+
+.submit-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
 }
 </style>

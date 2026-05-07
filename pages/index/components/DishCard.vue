@@ -51,12 +51,13 @@ function handleClick() {
 .dish-card {
   display: flex;
   background: #fff;
-  border-radius: 16rpx;
-  padding: 20rpx;
+  border-radius: var(--r-md);
+  padding: 16rpx;
   margin-bottom: 16rpx;
+  box-shadow: var(--shadow-sm);
 
   &.is-sold-out {
-    opacity: 0.6;
+    opacity: 0.55;
   }
 }
 
@@ -76,30 +77,31 @@ function handleClick() {
 
 .dish-name {
   font-size: 28rpx;
-  font-weight: bold;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
 }
 
 .dish-tag {
   font-size: 18rpx;
-  padding: 2rpx 8rpx;
-  border-radius: 4rpx;
+  padding: 2rpx 10rpx;
+  border-radius: var(--r-pill);
   line-height: 1.4;
+  font-weight: 600;
 
   &.tag-new {
-    color: $red;
-    border: 1rpx solid $red;
+    color: var(--abao-red);
+    background: var(--abao-red-soft);
   }
 
   &.tag-sold {
-    color: $dark-9;
-    border: 1rpx solid $dark-9;
+    color: var(--ink-500);
+    background: var(--ink-100);
   }
 }
 
 .dish-desc {
   font-size: 22rpx;
-  color: $dark-9;
+  color: var(--ink-500);
   margin-top: 4rpx;
 }
 
@@ -111,35 +113,40 @@ function handleClick() {
 
 .dish-price {
   font-size: 30rpx;
-  font-weight: bold;
-  color: $red;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .dish-btn {
   font-size: 24rpx;
   padding: 8rpx 20rpx;
-  border-radius: 24rpx;
+  border-radius: var(--r-pill);
   text-align: center;
+  font-weight: 600;
 
   &.add {
     width: 48rpx;
     height: 48rpx;
     border-radius: 50%;
-    background: $red;
+    background: var(--abao-red);
     color: #fff;
     font-size: 32rpx;
     line-height: 48rpx;
     padding: 0;
+    box-shadow: var(--shadow-red);
   }
 
   &.spec {
-    background: $red;
+    background: var(--abao-red);
     color: #fff;
+    border-radius: var(--r-pill);
   }
 
   &.sold-out {
-    background: #ccc;
-    color: #fff;
+    background: var(--ink-200);
+    color: var(--ink-500);
+    border-radius: var(--r-pill);
   }
 }
 </style>

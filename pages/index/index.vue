@@ -1,87 +1,101 @@
 <template>
   <view class="menu-page">
-    <!-- 顶部门店信息 -->
-    <view class="menu-header">
-      <view class="header-left">
-        <image class="header-logo" src="/static/logo.png" mode="aspectFit" />
-        <text class="store-name">{{ storeName || '阿堡' }}</text>
-        <text class="table-info" v-if="tableLabel">{{ tableLabel }}</text>
+    <!-- Hero 头部 -->
+    <view class="menu-hero">
+      <AbaoNavBar :title="''" :dark="true" :showBack="isScanEntry" @back="goBack" />
+      <view class="menu-hero-body">
+        <view class="menu-hero-brand">
+          <AbaoLogo size="lg" />
+          <text class="menu-hero-store">{{ storeName || '阿堡' }}</text>
+        </view>
+        <view class="menu-search" @click="handleSearch">
+          <text class="menu-search-icon">🔍</text>
+          <text class="menu-search-placeholder">搜索菜品</text>
+        </view>
       </view>
     </view>
 
-    <!-- Banner 轮播 -->
-    <view class="banner-area" v-if="banners.length">
-      <su-swiper
-        :list="banners"
-        dotStyle="tag"
-        :autoplay="true"
-        :interval="3000"
-        :height="240"
-        imageMode="aspectFill"
-      />
+    <!-- 桌台标签 -->
+    <view class="table-bar" v-if="tableLabel">
+      <AbaoChip variant="red" :text="tableLabel" />
     </view>
 
-    <!-- 主体：左侧分类 + 右侧菜品 -->
-    <view class="menu-body" v-if="!loading">
-      <!-- 左侧分类列 -->
-      <scroll-view class="sidebar" scroll-y>
+    <!-- 分类横向滚动 -->
+    <scroll-view class="cat-pills-scroll" scroll-x :show-scrollbar="false" v-if="flatCategories.length">
+      <view class="cat-pills-row">
         <view
           v-for="(cat, idx) in flatCategories"
           :key="idx"
-          class="sidebar-item"
+          class="cat-pill"
           :class="{ active: activeCategory === idx }"
           @click="switchCategory(idx)"
         >
-          <view class="sidebar-bar" v-if="activeCategory === idx" />
-          <text class="sidebar-name">{{ cat.name }}</text>
+          <text class="cat-pill-text">{{ cat.name }}</text>
         </view>
-      </scroll-view>
+      </view>
+    </scroll-view>
 
-      <!-- 右侧菜品列表 -->
-      <scroll-view
-        class="dish-scroll"
-        scroll-y
-        :scroll-into-view="scrollToId"
-        @scroll="onDishScroll"
-        :scroll-with-animation="true"
+    <!-- 菜品列表 -->
+    <scroll-view
+      v-if="!loading"
+      class="dish-scroll"
+      scroll-y
+      :scroll-into-view="scrollToId"
+      @scroll="onDishScroll"
+      :scroll-with-animation="true"
+      :style="{ height: dishScrollHeight + 'px' }"
+    >
+      <view
+        v-for="(cat, catIdx) in flatCategories"
+        :key="'sec-' + catIdx"
+        class="cat-section"
+        :id="'cat-' + catIdx"
       >
-        <view
-          v-for="(cat, catIdx) in flatCategories"
-          :key="'sec-' + catIdx"
-          class="cat-section"
-          :id="'cat-' + catIdx"
-        >
-          <view class="category-title">
-            {{ cat._parentName ? cat._parentName + ' · ' : '' }}{{ cat.name }}
-          </view>
-          <DishCard
-            v-for="dish in cat.dishes"
-            :key="dish.spuId"
-            :dish="dish"
-            @add="quickAdd"
-          />
+        <view class="category-title">
+          <text class="category-title-text">{{ cat._parentName ? cat._parentName + ' · ' : '' }}{{ cat.name }}</text>
         </view>
-        <view class="bottom-placeholder" />
-      </scroll-view>
-    </view>
+        <DishCard
+          v-for="dish in cat.dishes"
+          :key="dish.spuId"
+          :dish="dish"
+          @add="quickAdd"
+        />
+      </view>
+      <view class="bottom-placeholder" />
+    </scroll-view>
 
     <!-- 加载中 -->
     <view class="loading-view" v-if="loading">
       <text>加载菜单中...</text>
     </view>
 
+    <!-- 空状态：无菜单数据 -->
+    <view class="empty-view" v-if="!loading && flatCategories.length === 0">
+      <text class="empty-icon">🍽️</text>
+      <text class="empty-text">暂无菜单数据</text>
+      <text class="empty-hint">请先选择门店或联系管理员录入菜品</text>
+      <view class="empty-actions">
+        <button class="empty-btn" @click="goSelectStore">选择门店</button>
+        <button class="empty-btn empty-btn--secondary" @click="reloadMenu">重新加载</button>
+      </view>
+    </view>
+
     <!-- 底部购物车栏 -->
     <view class="cart-bar" @click="showCartPopup = true">
       <view class="cart-left">
         <view class="cart-icon" :class="{ 'has-items': cartStore.totalItems > 0 }">
-          <text class="cart-icon-text">&#x1F6D2;</text>
-          <text class="cart-badge" v-if="cartStore.totalItems > 0">{{ cartStore.totalItems }}</text>
+          <text class="cart-icon-emoji">🛒</text>
+          <view class="cart-badge" v-if="cartStore.totalItems > 0">
+            <text class="cart-badge-text">{{ cartStore.totalItems }}</text>
+          </view>
         </view>
-        <text class="cart-total" v-if="cartStore.totalItems > 0">¥{{ cartStore.totalPrice.toFixed(2) }}</text>
-        <text class="cart-empty" v-else>购物车空空如也</text>
+        <view class="cart-info">
+          <text class="cart-total" v-if="cartStore.totalItems > 0">¥{{ cartStore.totalPrice.toFixed(2) }}</text>
+          <text class="cart-empty" v-else>购物车空空如也</text>
+        </view>
       </view>
       <view class="cart-submit-btn" :class="{ disabled: cartStore.localIsEmpty }" @click.stop="goOrder">
-        去结算
+        <text class="cart-submit-text">去结算</text>
       </view>
     </view>
 
@@ -94,7 +108,7 @@
         </view>
         <scroll-view class="cart-popup-body" scroll-y>
           <view class="cart-popup-item" v-for="item in cartStore.localItems" :key="item.cartItemId">
-            <su-image :src="item.coverUrl || '/static/logo.png'" :width="120" :height="120" borderRadius="8rpx" />
+            <su-image :src="item.coverUrl || '/static/logo.png'" :width="120" :height="120" borderRadius="12rpx" />
             <view class="cart-item-info">
               <text class="cart-item-name">{{ item.spuName }}</text>
               <text class="cart-item-sku" v-if="item.skuName">{{ item.skuName }}</text>
@@ -104,7 +118,7 @@
               <view class="cart-item-bottom">
                 <text class="cart-item-price">¥{{ item.unitPrice + (item.addons || []).reduce((s, a) => s + (a.extraPrice || 0), 0) }}</text>
                 <view class="qty-ctrl">
-                  <view class="qty-btn" @click="cartStore.decreaseQuantity(item.cartItemId)">-</view>
+                  <view class="qty-btn" @click="cartStore.decreaseQuantity(item.cartItemId)">−</view>
                   <text class="qty-num">{{ item.quantity }}</text>
                   <view class="qty-btn" @click="cartStore.increaseQuantity(item.cartItemId)">+</view>
                 </view>
@@ -125,6 +139,9 @@
       @close="showAddonModal = false"
       @confirm="showAddonModal = false"
     />
+
+    <!-- 底部导航栏 -->
+    <AbaoTabBar />
   </view>
 </template>
 
@@ -134,6 +151,10 @@ import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
 import DishCard from './components/DishCard.vue';
 import AddonModal from './components/AddonModal.vue';
+import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
+import AbaoLogo from '@/components/abao/AbaoLogo.vue';
+import AbaoChip from '@/components/abao/AbaoChip.vue';
+import AbaoTabBar from '@/components/abao/AbaoTabBar.vue';
 
 const menuStore = sheep.$store('menu');
 const storeStore = sheep.$store('store');
@@ -148,15 +169,13 @@ const scrollToId = ref('');
 const showCartPopup = ref(false);
 const showAddonModal = ref(false);
 const selectedDish = ref({});
-const sectionTops = ref([]); // 各分类区域的偏移量（用于滚动联动）
+const sectionTops = ref([]);
+const dishScrollHeight = ref(0);
 
 const storeName = computed(() => storeStore.storeName);
 const tableLabel = computed(() => tableStore.tableLabel);
 
-const banners = ref([
-  { type: 'image', src: '/static/logo.png' },
-  { type: 'image', src: '/static/logo.png' },
-]);
+const isScanEntry = ref(false);
 
 // 展平分类树
 const flatCategories = computed(() => {
@@ -175,7 +194,16 @@ const flatCategories = computed(() => {
   return result;
 });
 
-onLoad(async () => {
+function goBack() {
+  uni.navigateBack({ delta: 1 });
+}
+
+function goSelectStore() {
+  uni.navigateTo({ url: '/pages/index/stores' });
+}
+
+async function reloadMenu() {
+  loading.value = true;
   const storeId = storeStore.storeId || 3;
   const data = await menuStore.fetchMenu(storeId);
   if (data) {
@@ -183,7 +211,29 @@ onLoad(async () => {
     combos.value = data.combos || [];
   }
   loading.value = false;
-  // 等 DOM 渲染后计算各分类区域位置
+}
+
+function handleSearch() {
+  uni.navigateTo({ url: '/pages/index/search' });
+}
+
+onLoad(async (options) => {
+  if (options && options.tableId) {
+    isScanEntry.value = true;
+  }
+  const storeId = storeStore.storeId || 3;
+  const data = await menuStore.fetchMenu(storeId);
+  if (data) {
+    categories.value = data.categories || [];
+    combos.value = data.combos || [];
+  }
+  loading.value = false;
+
+  // 计算菜品列表可用高度
+  const sysInfo = uni.getSystemInfoSync();
+  const navH = 44 + (sysInfo.statusBarHeight || 44);
+  dishScrollHeight.value = sysInfo.windowHeight - navH - 180 - 60 - 52 - 50;
+
   await nextTick();
   setTimeout(() => calcSectionTops(), 300);
 });
@@ -217,10 +267,6 @@ function onDishScroll(e) {
 function switchCategory(idx) {
   activeCategory.value = idx;
   scrollToId.value = 'cat-' + idx;
-}
-
-function goDetail(dish) {
-  uni.navigateTo({ url: '/pages/dish/detail?spuId=' + dish.spuId });
 }
 
 function quickAdd(dish) {
@@ -266,98 +312,96 @@ function handleClearCart() {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f6f6f6;
+  background: var(--bg);
 }
 
-/* 顶部 */
-.menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 30rpx;
-  background: #fff;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.header-logo {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-}
-
-.store-name {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: $dark-3;
-}
-
-.table-info {
-  font-size: 24rpx;
-  color: $red;
-}
-
-.banner-area {
-  padding: 0 20rpx 12rpx;
-  background: #fff;
-}
-
-/* 主体：flex 横向 */
-.menu-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-/* 左侧分类列 */
-.sidebar {
-  width: 180rpx;
-  background: #f8f8f8;
+/* ── Hero ── */
+.menu-hero {
+  background: linear-gradient(135deg, var(--abao-red) 0%, var(--abao-red-deep) 100%);
   flex-shrink: 0;
 }
 
-.sidebar-item {
+.menu-hero-body {
+  padding: 0 28rpx 28rpx;
+}
+
+.menu-hero-brand {
   display: flex;
   align-items: center;
-  padding: 28rpx 20rpx;
-  position: relative;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.menu-hero-store {
+  font-family: var(--font-display);
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #fff;
+}
+
+.menu-search {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--r-pill);
+  padding: 18rpx 28rpx;
+}
+
+.menu-search-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.menu-search-placeholder {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── 桌台标签 ── */
+.table-bar {
+  padding: 16rpx 28rpx;
+  background: #fff;
+}
+
+/* ── 分类药丸 ── */
+.cat-pills-scroll {
+  background: #fff;
+  flex-shrink: 0;
+  padding-bottom: 12rpx;
+}
+
+.cat-pills-row {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 28rpx;
+  white-space: nowrap;
+}
+
+.cat-pill {
+  display: inline-flex;
+  padding: 12rpx 24rpx;
+  border-radius: var(--r-pill);
+  background: var(--ink-100);
+  flex-shrink: 0;
 
   &.active {
-    background: #fff;
+    background: var(--abao-red);
 
-    .sidebar-name {
-      color: $red;
-      font-weight: bold;
+    .cat-pill-text {
+      color: #fff;
     }
   }
 }
 
-.sidebar-bar {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4rpx;
-  height: 32rpx;
-  background: $red;
-  border-radius: 0 3rpx 3rpx 0;
+.cat-pill-text {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--ink-700);
 }
 
-.sidebar-name {
-  font-size: 26rpx;
-  color: $dark-6;
-  line-height: 1.3;
-  word-break: keep-all;
-}
-
-/* 右侧菜品列表 */
+/* ── 菜品列表 ── */
 .dish-scroll {
-  flex: 1;
-  padding: 0 20rpx;
+  padding: 0 28rpx;
 }
 
 .cat-section {
@@ -365,39 +409,93 @@ function handleClearCart() {
 }
 
 .category-title {
-  padding: 24rpx 10rpx 16rpx;
-  font-size: 28rpx;
-  font-weight: bold;
-  color: $dark-3;
+  padding: 32rpx 0 20rpx;
+}
+
+.category-title-text {
+  font-family: var(--font-display);
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--ink-900);
 }
 
 .bottom-placeholder {
-  height: 140rpx;
+  height: 160rpx;
 }
 
-/* 加载中 */
 .loading-view {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
-/* 底部购物车栏 */
+.empty-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--ink-700);
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: var(--ink-500);
+  margin-bottom: 36rpx;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.empty-btn {
+  padding: 16rpx 36rpx;
+  border-radius: var(--r-pill);
+  font-size: 26rpx;
+  font-weight: 600;
+  border: none;
+  background: var(--abao-red);
+  color: #fff;
+  box-shadow: var(--shadow-red);
+
+  &--secondary {
+    background: #fff;
+    color: var(--abao-red);
+    border: 2rpx solid var(--abao-red);
+    box-shadow: none;
+  }
+}
+
+/* ── 底部购物车栏 ── */
 .cart-bar {
   position: fixed;
   bottom: 100rpx;
   left: 0;
   right: 0;
-  height: 100rpx;
+  height: 104rpx;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 30rpx;
-  border-top: 1rpx solid #eee;
+  border-top: 0.5px solid var(--ink-200);
+  box-shadow: var(--shadow-md);
   z-index: 100;
 }
 
@@ -408,21 +506,18 @@ function handleClearCart() {
 }
 
 .cart-icon {
-  width: 64rpx;
-  height: 64rpx;
-  background: $red;
+  width: 68rpx;
+  height: 68rpx;
+  background: var(--abao-red);
   border-radius: 50%;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &.has-items {
-    background: $red;
-  }
+  box-shadow: var(--shadow-red);
 }
 
-.cart-icon-text {
+.cart-icon-emoji {
   font-size: 36rpx;
 }
 
@@ -431,40 +526,57 @@ function handleClearCart() {
   top: -8rpx;
   right: -8rpx;
   background: #fff;
-  color: $red;
   border-radius: 50%;
   width: 32rpx;
   height: 32rpx;
-  font-size: 20rpx;
-  text-align: center;
-  line-height: 32rpx;
-  border: 2rpx solid $red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid var(--abao-red);
+}
+
+.cart-badge-text {
+  font-size: 18rpx;
+  color: var(--abao-red);
+  font-weight: 700;
+}
+
+.cart-info {
+  // cart info wrapper
 }
 
 .cart-total {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: $red;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .cart-empty {
-  font-size: 26rpx;
-  color: $dark-9;
+  font-size: 24rpx;
+  color: var(--ink-500);
 }
 
 .cart-submit-btn {
-  padding: 16rpx 40rpx;
-  background: $red;
+  padding: 18rpx 44rpx;
+  background: var(--abao-red);
   color: #fff;
-  border-radius: 40rpx;
-  font-size: 28rpx;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-red);
 
   &.disabled {
-    background: #ccc;
+    background: var(--ink-300);
+    box-shadow: none;
   }
 }
 
-/* 购物车弹窗 */
+.cart-submit-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ── 购物车弹窗 ── */
 .cart-popup {
   height: 60vh;
   display: flex;
@@ -476,17 +588,18 @@ function handleClearCart() {
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 0.5px solid var(--ink-200);
 }
 
 .cart-popup-title {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--ink-900);
 }
 
 .cart-clear {
   font-size: 26rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .cart-popup-body {
@@ -497,7 +610,7 @@ function handleClearCart() {
 .cart-popup-item {
   display: flex;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 0.5px solid var(--ink-100);
 }
 
 .cart-item-info {
@@ -510,18 +623,18 @@ function handleClearCart() {
 
 .cart-item-name {
   font-size: 28rpx;
-  font-weight: bold;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
 }
 
 .cart-item-sku {
   font-size: 22rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .cart-item-addons {
   font-size: 20rpx;
-  color: $dark-a;
+  color: var(--ink-300);
 }
 
 .cart-item-bottom {
@@ -532,8 +645,9 @@ function handleClearCart() {
 
 .cart-item-price {
   font-size: 28rpx;
-  font-weight: bold;
-  color: $red;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .qty-ctrl {
@@ -543,25 +657,28 @@ function handleClearCart() {
 }
 
 .qty-btn {
-  width: 40rpx;
-  height: 40rpx;
+  width: 44rpx;
+  height: 44rpx;
   border-radius: 50%;
-  border: 1rpx solid #ddd;
-  text-align: center;
-  line-height: 40rpx;
+  border: 1px solid var(--ink-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 28rpx;
+  color: var(--ink-700);
 }
 
 .qty-num {
   font-size: 28rpx;
   min-width: 36rpx;
   text-align: center;
+  color: var(--ink-900);
 }
 
 .cart-empty-body {
   text-align: center;
   padding-top: 100rpx;
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 </style>

@@ -1,19 +1,27 @@
 <template>
-  <s-layout title="我的订单">
-    <su-sticky bgColor="#fff">
-      <su-tabs
-        :list="tabMaps"
-        :scrollable="false"
-        @change="onTabsChange"
-        :current="state.currentTab"
-      />
-    </su-sticky>
+  <view class="order-list-page">
+    <AbaoNavBar title="我的订单" />
 
-    <s-empty v-if="!state.loading && state.pagination.total === 0" text="暂无订单" />
-
-    <view v-if="state.pagination.total > 0">
+    <!-- Tab 切换 -->
+    <view class="tabs-bar">
       <view
-        class="order-card ss-m-20 ss-r-12 bg-white"
+        v-for="(tab, idx) in tabMaps"
+        :key="idx"
+        class="tabs-item"
+        :class="{ active: state.currentTab === idx }"
+        @click="onTabsChange({ index: idx })"
+      >
+        <text class="tabs-text">{{ tab.name }}</text>
+      </view>
+    </view>
+
+    <view class="order-empty" v-if="!state.loading && state.pagination.total === 0">
+      <text>暂无订单</text>
+    </view>
+
+    <scroll-view class="order-scroll" scroll-y v-if="state.pagination.total > 0" :style="{ height: scrollHeight + 'px' }">
+      <view
+        class="order-card"
         v-for="order in state.pagination.list"
         :key="order.id"
         @tap="onOrderDetail(order.id)"
@@ -44,23 +52,28 @@
           <button class="action-btn pay-btn" @tap.stop="onPay(order.id)">去支付</button>
         </view>
       </view>
-    </view>
 
-    <uni-load-more
-      v-if="state.pagination.total > 0"
-      :status="state.loadStatus"
-      :content-text="{ contentdown: '上拉加载更多' }"
-    />
-  </s-layout>
+      <uni-load-more
+        :status="state.loadStatus"
+        :content-text="{ contentdown: '上拉加载更多' }"
+      />
+    </scroll-view>
+
+    <AbaoTabBar />
+  </view>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { onLoad, onShow, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
+import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
+import AbaoTabBar from '@/components/abao/AbaoTabBar.vue';
 import OrderApi from '@/sheep/api/restaurant/restaurant_order';
 import { concat } from 'lodash-es';
 import { resetPagination } from '@/sheep/helper/utils';
+
+const scrollHeight = ref(0);
 
 const state = reactive({
   currentTab: 0,
@@ -142,6 +155,10 @@ async function onCancel(orderId) {
 }
 
 onLoad((options) => {
+  const sysInfo = uni.getSystemInfoSync();
+  const navH = 44 + (sysInfo.statusBarHeight || 44);
+  scrollHeight.value = sysInfo.windowHeight - navH - 44 - 50;
+
   const appStore = sheep.$store('app');
   const tabParams = appStore.paramsForTabbar;
   if (tabParams && tabParams.type !== undefined) {
@@ -175,8 +192,70 @@ onPullDownRefresh(() => {
 </script>
 
 <style lang="scss" scoped>
+.order-list-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Tabs ── */
+.tabs-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 0.5px solid var(--ink-200);
+  flex-shrink: 0;
+}
+
+.tabs-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  position: relative;
+
+  &.active {
+    .tabs-text {
+      color: var(--abao-red);
+      font-weight: 700;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40rpx;
+      height: 4rpx;
+      background: var(--abao-red);
+      border-radius: 2rpx;
+    }
+  }
+}
+
+.tabs-text {
+  font-size: 28rpx;
+  color: var(--ink-500);
+}
+
+.order-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: var(--ink-500);
+}
+
+.order-scroll {
+  padding: 0 20rpx;
+}
+
 .order-card {
+  background: #fff;
   padding: 24rpx;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  margin: 16rpx 0;
 }
 
 .order-header {
@@ -184,18 +263,18 @@ onPullDownRefresh(() => {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 0.5px solid var(--ink-100);
 }
 
 .order-no {
   font-size: 26rpx;
-  font-weight: 500;
-  color: $dark-3;
+  font-weight: 600;
+  color: var(--ink-900);
 }
 
 .order-status {
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .order-body {
@@ -210,12 +289,12 @@ onPullDownRefresh(() => {
 
 .item-label {
   font-size: 26rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .item-value {
   font-size: 26rpx;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .order-footer {
@@ -223,19 +302,19 @@ onPullDownRefresh(() => {
   justify-content: flex-end;
   align-items: baseline;
   padding: 16rpx 0;
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 0.5px solid var(--ink-100);
 }
 
 .footer-label {
   font-size: 26rpx;
-  color: $dark-9;
+  color: var(--ink-500);
 }
 
 .footer-price {
   font-size: 30rpx;
-  font-weight: bold;
-  color: $red;
-  font-family: OPPOSANS;
+  font-weight: 700;
+  color: var(--abao-red);
+  font-family: var(--font-num);
 }
 
 .order-actions {
@@ -248,20 +327,22 @@ onPullDownRefresh(() => {
 .action-btn {
   width: 160rpx;
   height: 56rpx;
-  border-radius: 28rpx;
+  border-radius: var(--r-pill);
   font-size: 24rpx;
   line-height: 56rpx;
   border: none;
   padding: 0;
+  font-weight: 600;
 }
 
 .cancel-btn {
-  background: #eee;
-  color: $dark-6;
+  background: var(--ink-100);
+  color: var(--ink-700);
 }
 
 .pay-btn {
-  background: $red;
+  background: var(--abao-red);
   color: #fff;
+  box-shadow: var(--shadow-red);
 }
 </style>
