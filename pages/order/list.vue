@@ -100,8 +100,8 @@ function statusLabel(status) {
 }
 
 function statusColor(status) {
-  const map = { 0: '#FAAD14', 1: '#D4351C', 2: '#FAAD14', 3: '#52C41A', 4: '#999', 5: '#999' };
-  return map[status] || '#999';
+  const map = { 0: '#FAAD14', 1: 'var(--abao-red)', 2: '#FAAD14', 3: '#52C41A', 4: 'var(--ink-300)', 5: 'var(--ink-300)' };
+  return map[status] || 'var(--ink-300)';
 }
 
 function formatTime(time) {

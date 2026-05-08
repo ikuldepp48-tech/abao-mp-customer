@@ -199,19 +199,19 @@ function handleClose() {
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 1rpx solid var(--ink-100);
   flex-shrink: 0;
 }
 
 .modal-title {
   font-size: 32rpx;
   font-weight: bold;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .modal-close {
   font-size: 36rpx;
-  color: $dark-9;
+  color: var(--ink-300);
   padding: 8rpx;
 }
 
@@ -222,21 +222,21 @@ function handleClose() {
 
 .option-section {
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid var(--ink-100);
 }
 
 .option-title {
   font-size: 26rpx;
   font-weight: bold;
-  color: $dark-3;
+  color: var(--ink-900);
   margin-bottom: 16rpx;
   display: block;
 }
 
 .required-tag {
   font-size: 18rpx;
-  color: $red;
-  border: 1rpx solid $red;
+  color: var(--abao-red);
+  border: 1rpx solid var(--abao-red);
   border-radius: 4rpx;
   padding: 2rpx 8rpx;
   margin-left: 8rpx;
@@ -250,30 +250,30 @@ function handleClose() {
 
 .option-tag {
   padding: 12rpx 24rpx;
-  border-radius: 8rpx;
-  border: 1rpx solid #ddd;
+  border-radius: var(--r-sm);
+  border: 1rpx solid var(--ink-200);
   font-size: 26rpx;
-  color: $dark-6;
-  background: #fafafa;
+  color: var(--ink-500);
+  background: var(--ink-100);
 
   &.selected {
-    border-color: $red;
-    color: $red;
-    background: #fff5f5;
+    border-color: var(--abao-red);
+    color: var(--abao-red);
+    background: var(--abao-red-soft);
   }
 }
 
 .price-extra {
   font-size: 22rpx;
-  color: $red;
+  color: var(--abao-red);
   margin-left: 4rpx;
 }
 
 .remark-input {
   width: 100%;
   height: 60rpx;
-  border: 1rpx solid #eee;
-  border-radius: 8rpx;
+  border: 1rpx solid var(--ink-100);
+  border-radius: var(--r-sm);
   padding: 0 16rpx;
   font-size: 26rpx;
   box-sizing: border-box;
@@ -289,7 +289,7 @@ function handleClose() {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  border: 1rpx solid #ddd;
+  border: 1rpx solid var(--ink-200);
   text-align: center;
   line-height: 48rpx;
   font-size: 32rpx;
@@ -307,26 +307,26 @@ function handleClose() {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 30rpx;
-  border-top: 1rpx solid #eee;
+  border-top: 1rpx solid var(--ink-100);
   flex-shrink: 0;
 }
 
 .footer-price {
   font-size: 36rpx;
   font-weight: bold;
-  color: $red;
+  color: var(--abao-red);
 }
 
 .footer-btn {
   padding: 16rpx 48rpx;
-  background: $red;
+  background: var(--abao-red);
   color: #fff;
-  border-radius: 40rpx;
+  border-radius: var(--r-pill);
   font-size: 28rpx;
   font-weight: bold;
 
   &.disabled {
-    background: #ccc;
+    background: var(--ink-200);
   }
 }
 </style>
