@@ -256,7 +256,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .status-header {
-  background: linear-gradient(135deg, $red, #E85D3A);
+  background: linear-gradient(135deg, var(--abao-red), #E85D3A);
   padding: 40rpx 30rpx 30rpx;
   color: #fff;
 }
@@ -291,7 +291,7 @@ onUnmounted(() => {
   width: 24rpx;
   height: 24rpx;
   border-radius: 50%;
-  background: #ddd;
+  background: var(--ink-200);
   z-index: 1;
 }
 
@@ -301,7 +301,7 @@ onUnmounted(() => {
   left: 50%;
   width: 100%;
   height: 4rpx;
-  background: #ddd;
+  background: var(--ink-200);
   z-index: 0;
 }
 
@@ -318,22 +318,22 @@ onUnmounted(() => {
 
 /* 当前：红色 */
 .progress-step.current .step-dot {
-  background: $red;
+  background: var(--abao-red);
 }
 .progress-step.current .step-label {
-  color: $red;
+  color: var(--abao-red);
   font-weight: 500;
 }
 
 /* 未来：灰色 */
 .progress-step.future .step-dot {
-  background: #ddd;
+  background: var(--ink-200);
 }
 .progress-step.future .step-line {
-  background: #ddd;
+  background: var(--ink-200);
 }
 .progress-step.future .step-label {
-  color: #bbb;
+  color: var(--ink-200);
 }
 
 /* 已取消 */
@@ -349,12 +349,12 @@ onUnmounted(() => {
   width: 32rpx;
   height: 32rpx;
   border-radius: 50%;
-  background: $dark-9;
+  background: var(--ink-300);
 }
 
 .cancelled-text {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-300);
   margin-top: 10rpx;
 }
 
@@ -370,7 +370,7 @@ onUnmounted(() => {
   padding: 16rpx 0;
 
   &:not(:last-child) {
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--ink-100);
   }
 }
 
@@ -381,18 +381,18 @@ onUnmounted(() => {
 .item-name {
   font-size: 28rpx;
   font-weight: 500;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .item-sku {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-300);
   margin-left: 8rpx;
 }
 
 .item-addons {
   font-size: 22rpx;
-  color: $dark-a;
+  color: var(--ink-300);
   display: block;
   margin-top: 4rpx;
 }
@@ -409,7 +409,7 @@ onUnmounted(() => {
 
 .item-qty {
   font-size: 24rpx;
-  color: $dark-9;
+  color: var(--ink-300);
   display: block;
   margin-top: 4rpx;
 }
@@ -427,13 +427,13 @@ onUnmounted(() => {
   padding: 14rpx 0;
 
   &:not(:last-child) {
-    border-bottom: 1rpx solid #f5f5f5;
+    border-bottom: 1rpx solid var(--ink-100);
   }
 }
 
 .info-label {
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-300);
 }
 
 .info-right {
@@ -443,17 +443,17 @@ onUnmounted(() => {
 
 .info-value {
   font-size: 28rpx;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .copy-btn {
   width: 80rpx;
   height: 44rpx;
   line-height: 44rpx;
-  background: #eee;
+  background: var(--ink-100);
   border-radius: 22rpx;
   font-size: 22rpx;
-  color: $dark-6;
+  color: var(--ink-500);
   border: none;
   margin-left: 16rpx;
   padding: 0;
@@ -474,16 +474,16 @@ onUnmounted(() => {
 
 .price-label {
   font-size: 28rpx;
-  color: $dark-9;
+  color: var(--ink-300);
 }
 
 .price-value {
   font-size: 28rpx;
-  color: $dark-3;
+  color: var(--ink-900);
 }
 
 .price-red {
-  color: $red;
+  color: var(--abao-red);
 }
 
 .price-big {
@@ -492,7 +492,7 @@ onUnmounted(() => {
 }
 
 .price-total {
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 1rpx solid var(--ink-100);
   margin-top: 8rpx;
   padding-top: 16rpx;
 }
@@ -513,17 +513,17 @@ onUnmounted(() => {
 }
 
 .cancel-btn {
-  background: #eee;
-  color: $dark-6;
+  background: var(--ink-100);
+  color: var(--ink-500);
 }
 
 .pay-btn {
-  background: $red;
+  background: var(--abao-red);
   color: #fff;
 }
 
 .back-btn {
-  background: #eee;
-  color: $dark-6;
+  background: var(--ink-100);
+  color: var(--ink-500);
 }
 </style>

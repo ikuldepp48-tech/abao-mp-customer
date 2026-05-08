@@ -161,7 +161,7 @@
         width: 200rpx;
         height: 100%;
         padding-left: 12rpx;
-        background-color: #f6f6f6;
+        background-color: var(--ink-100);
         position: fixed;
         left: 0;
 
@@ -175,7 +175,7 @@
             line-height: 32rpx;
             font-size: 30rpx;
             font-weight: 400;
-            color: #333;
+            color: var(--ink-900);
             margin-left: 28rpx;
             position: relative;
             z-index: 0;

@@ -53,7 +53,7 @@
               "
               :title="item.spu.name"
               :titleWidth="400"
-              priceColor="#FF3000"
+              priceColor="var(--abao-red)"
             >
               <template v-if="!state.editMode" v-slot:tool>
                 <su-number-box
@@ -265,7 +265,7 @@
 
     .cart-header {
       height: 70rpx;
-      background-color: #f6f6f6;
+      background-color: var(--ink-100);
       width: 100%;
       position: fixed;
       left: 0;
@@ -302,12 +302,12 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background: rgba(#fff, 0.8);
+        background: rgba(255, 255, 255, 0.8);
         z-index: 2;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #999;
+        color: var(--ink-300);
         font-size: 32rpx;
       }
     }

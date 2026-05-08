@@ -280,13 +280,13 @@
     .tip-text {
       font-size: 30rpx;
       font-weight: bold;
-      color: #333333;
+      color: var(--ink-900);
     }
 
     .pay-total-num {
       font-size: 36rpx;
       font-weight: 500;
-      color: #333333;
+      color: var(--ink-900);
       font-family: OPPOSANS;
     }
 
@@ -297,20 +297,20 @@
         width: 190rpx;
         height: 70rpx;
         font-size: 28rpx;
-        border: 2rpx solid #dfdfdf;
+        border: 2rpx solid var(--ink-200);
         border-radius: 35rpx;
         font-weight: 400;
-        color: #595959;
+        color: var(--ink-500);
       }
 
       .check-btn {
         width: 190rpx;
         height: 70rpx;
         font-size: 28rpx;
-        border: 2rpx solid #dfdfdf;
+        border: 2rpx solid var(--ink-200);
         border-radius: 35rpx;
         font-weight: 400;
-        color: #595959;
+        color: var(--ink-500);
         margin-left: 32rpx;
       }
     }
@@ -325,7 +325,7 @@
         font-weight: 500;
         font-size: 32rpx;
         line-height: 36rpx;
-        color: #434343;
+        color: var(--ink-700);
       }
 
       .subscribe-start {
