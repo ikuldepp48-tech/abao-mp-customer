@@ -1,50 +1,51 @@
 /* ============================================
    阿堡 ABAO 品牌设计系统
-   来源：/Users/mac/Downloads/阿堡小程序/design-system.css
-   OKLCH → HEX 转换（uniApp 不支持 oklch()）
+   来源：design-system.css（OKLCH 色彩空间）
+   OKLCH → HEX 转换（uniApp 兼容）
    ============================================ */
 
-/* ===== 品牌色 ===== */
+/* ===== 品牌色（OKLCH → sRGB） ===== */
 page {
-  --abao-red: #D4351C;
-  --abao-red-deep: #A62812;
-  --abao-red-soft: #F5E8E5;
-  --abao-red-ink: #7A1A0D;
-  --abao-yellow: #F5C542;
-  --abao-yellow-soft: #FBF3D9;
-  --abao-yellow-deep: #D19E1C;
-  --abao-cream: #FBF9F5;
-  --abao-paper: #F9F6F2;
+  --abao-red: #DB2C2B;        /* oklch(0.58 0.21 27) */
+  --abao-red-deep: #B3000C;   /* oklch(0.48 0.20 27) */
+  --abao-red-soft: #FFD8D2;   /* oklch(0.92 0.05 27) */
+  --abao-red-ink: #890000;    /* oklch(0.38 0.18 27) */
+  --abao-yellow: #FFD22D;     /* oklch(0.88 0.17 92) */
+  --abao-yellow-soft: #FFF1B4; /* oklch(0.96 0.08 92) */
+  --abao-yellow-deep: #F2A700; /* oklch(0.78 0.18 80) */
+  --abao-cream: #FDF7ED;      /* oklch(0.98 0.015 80) */
+  --abao-paper: #FAF3EC;      /* oklch(0.97 0.012 70) */
 
   /* 暖色调中性色 */
-  --ink-900: #2D2A28;
-  --ink-700: #504B48;
-  --ink-500: #827C78;
-  --ink-300: #C6C0BC;
-  --ink-200: #DFDCD8;
-  --ink-100: #EFEDEB;
-  --bg: #FBFAF8;
+  --ink-900: #15100E;         /* oklch(0.18 0.01 30) */
+  --ink-700: #37312F;         /* oklch(0.32 0.01 30) */
+  --ink-500: #6E6665;         /* oklch(0.52 0.01 30) */
+  --ink-300: #BDB5B3;         /* oklch(0.78 0.01 30) */
+  --ink-200: #DCD5D4;         /* oklch(0.88 0.008 30) */
+  --ink-100: #EEE9E8;         /* oklch(0.94 0.005 30) */
+  --bg: #FCF9F6;              /* oklch(0.985 0.005 60) */
 
   /* 辅助色 */
-  --accent-mint: #9ED6C9;
-  --accent-blush: #E8D4D4;
-  --accent-sky: #9DC8E0;
+  --accent-mint: #82D8B3;     /* oklch(0.82 0.10 165) */
+  --accent-blush: #FBBFBD;    /* oklch(0.86 0.07 20) */
+  --accent-sky: #8DCEEE;      /* oklch(0.82 0.08 230) */
 
-  /* 圆角系统 */
+  /* 圆角系统（与 design-system.css 对齐） */
   --r-sm: 8px;
-  --r-md: 20px;
-  --r-lg: 30px;
-  --r-xl: 40px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 28px;
   --r-pill: 999px;
 
-  /* 阴影系统 */
+  /* 阴影系统（暖色调） */
   --shadow-sm: 0 1px 2px rgba(20,10,5,.05), 0 2px 6px rgba(20,10,5,.04);
   --shadow-md: 0 4px 14px rgba(140,30,20,.08), 0 1px 3px rgba(20,10,5,.05);
   --shadow-lg: 0 12px 32px rgba(140,30,20,.12), 0 4px 12px rgba(20,10,5,.06);
-  --shadow-red: 0 8px 24px rgba(196,40,30,.30);
+  --shadow-red: 0 8px 24px rgba(219,44,43,.30);  /* --abao-red 叠加 */
 
-  /* 字体 */
-  --font-display: "Songti SC", "STSong", serif;
-  --font-body: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
-  --font-num: "Helvetica Neue", system-ui;
+  /* 字体系统 */
+  --font-display: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --font-body: "HarmonyOS Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+  --font-mono: "DM Mono", "SF Mono", "JetBrains Mono", monospace;
+  --font-num: "DIN Alternate", "Helvetica Neue", system-ui;
 }

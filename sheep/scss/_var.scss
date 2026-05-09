@@ -2,15 +2,15 @@
 
 //颜色 ，渐变背景60%
 // 阿堡品牌色系（OKLCH → HEX）
-$red: #D4351C;                // 阿堡红 --abao-red
-$abao-red-deep: #A62812;      // 深红 --abao-red-deep
-$abao-red-soft: #F5E8E5;      // 浅红 --abao-red-soft
-$abao-red-ink: #7A1A0D;       // 印泥红 --abao-red-ink
-$abao-yellow: #F5C542;        // 铭黄 --abao-yellow
-$abao-yellow-soft: #FBF3D9;   // 浅黄 --abao-yellow-soft
-$abao-yellow-deep: #D19E1C;   // 深黄 --abao-yellow-deep
-$abao-cream: #FBF9F5;         // 奶油 --abao-cream
-$abao-paper: #F9F6F2;         // 纸色 --abao-paper
+$red: #DB2C2B;                // 阿堡红 --abao-red (oklch(0.58 0.21 27))
+$abao-red-deep: #B3000C;      // 深红 --abao-red-deep (oklch(0.48 0.20 27))
+$abao-red-soft: #FFD8D2;      // 浅红 --abao-red-soft (oklch(0.92 0.05 27))
+$abao-red-ink: #890000;       // 印泥红 --abao-red-ink (oklch(0.38 0.18 27))
+$abao-yellow: #FFD22D;        // 铭黄 --abao-yellow (oklch(0.88 0.17 92))
+$abao-yellow-soft: #FFF1B4;   // 浅黄 --abao-yellow-soft (oklch(0.96 0.08 92))
+$abao-yellow-deep: #F2A700;   // 深黄 --abao-yellow-deep (oklch(0.78 0.18 80))
+$abao-cream: #FDF7ED;         // 奶油 --abao-cream (oklch(0.98 0.015 80))
+$abao-paper: #FAF3EC;         // 纸色 --abao-paper (oklch(0.97 0.012 70))
 $orange: #f37b1d;   // 桔橙
 $gold: #fbbd08;     // 明黄
 $green: #8dc63f;    // 橄榄绿
@@ -110,11 +110,11 @@ $radius: 10rpx !default; // 默认圆角大小
 $radius-lg: 40rpx !default; // 大圆角
 $radius-sm: 6rpx !default; // 小圆角
 $round-pill: 1000rpx !default; // 半圆
-// 阿堡品牌圆角（设计系统）
-$r-sm: 16rpx;
-$r-md: 40rpx;
-$r-lg: 60rpx;
-$r-xl: 80rpx;
+// 阿堡品牌圆角（设计系统，px * 2 = rpx）
+$r-sm: 16rpx;   // 8px
+$r-md: 28rpx;   // 14px
+$r-lg: 44rpx;   // 22px
+$r-xl: 56rpx;   // 28px
 
 // 动画过渡
 $transition-base: all 0.2s ease-in-out !default; // 默认过渡
@@ -138,9 +138,10 @@ $spacers: map-merge(
   $spacers
 );
 // 字形
-$font-display: "Songti SC", "STSong", serif; // 阿堡展示字体（对标 Noto Serif SC）
-$font-body: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif; // 阿堡正文字体
-$font-num: "Helvetica Neue", system-ui; // 阿堡数字字体
+$font-display: "Noto Serif SC", "Songti SC", "STSong", serif; // 阿堡展示字体
+$font-body: "HarmonyOS Sans SC", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif; // 阿堡正文字体
+$font-mono: "DM Mono", "SF Mono", "JetBrains Mono", monospace; // 阿堡等宽字体
+$font-num: "DIN Alternate", "Helvetica Neue", system-ui; // 阿堡数字字体
 $font-weight-lighter: lighter !default;
 $font-weight-light: 300 !default;
 $font-weight-normal: 400 !default;

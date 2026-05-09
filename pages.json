@@ -311,6 +311,17 @@
       ]
     },
     {
+      "root": "pages/dev",
+      "pages": [
+        {
+          "path": "color-test",
+          "style": {
+            "navigationBarTitleText": "颜色测试"
+          }
+        }
+      ]
+    },
+    {
       "root": "pages/dish",
       "pages": [
         {
@@ -343,7 +354,7 @@
   "tabBar": {
     "custom": true,
     "color": "#999999",
-    "selectedColor": "#D4351C",
+    "selectedColor": "#DB2C2B",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
