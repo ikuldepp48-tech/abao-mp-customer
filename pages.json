@@ -318,6 +318,12 @@
           "style": {
             "navigationBarTitleText": "颜色测试"
           }
+        },
+        {
+          "path": "components",
+          "style": {
+            "navigationBarTitleText": "Abao组件库示例"
+          }
         }
       ]
     },
