@@ -158,13 +158,16 @@ const dishImages = computed(() => {
 });
 
 // debug
+const isDebug = ref(false);
 function debugSet(state) {
+  isDebug.value = true;
   if (state === 'loading') { loading.value = true; loadError.value = false; return; }
   if (state === 'error') { loadError.value = true; loading.value = false; return; }
-  if (state === 'normal') { loadError.value = false; retryLoad(); return; }
+  if (state === 'normal') { isDebug.value = false; loadError.value = false; loading.value = false; dish.value = { name:'调试菜品', minPrice:32, spuId:1, coverUrl:'/static/logo.png', skus:[], addons:[] }; return; }
 }
 
 onLoad(async (options) => {
+  if (isDebug.value) return;
   const spuId = Number(options.spuId);
   let data = menuStore.getDishById(spuId);
 

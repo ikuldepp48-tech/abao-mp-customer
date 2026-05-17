@@ -268,14 +268,17 @@ function retryLoad() {
 }
 
 // debug
+const isDebug = ref(false);
 function debugSet(s) {
+  isDebug.value = true;
   if (s === 'loading') { loading.value = true; loadError.value = false; return; }
   if (s === 'error') { loadError.value = true; loading.value = false; return; }
   if (s === 'empty') { loading.value = false; loadError.value = false; state.list = []; return; }
-  if (s === 'normal') { loading.value = false; loadError.value = false; getCartList(); return; }
+  if (s === 'normal') { isDebug.value = false; loading.value = false; loadError.value = false; getCartList(); return; }
 }
 
 onShow(() => {
+  if (isDebug.value) return;
   calcScrollHeight();
   getCartList();
   // 预加载菜单数据用于加购推荐

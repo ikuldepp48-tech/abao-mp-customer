@@ -191,14 +191,17 @@ async function onCancel(orderId) {
 }
 
 // debug
+const isDebug = ref(false);
 function debugSet(s) {
+  isDebug.value = true;
   if (s === 'loading') { state.loading = true; loadError.value = false; return; }
   if (s === 'error') { loadError.value = true; state.loading = false; return; }
   if (s === 'empty') { state.loading = false; loadError.value = false; state.pagination.total = 0; state.pagination.list = []; return; }
-  if (s === 'normal') { state.loading = false; loadError.value = false; resetPagination(state.pagination); getOrderList(); return; }
+  if (s === 'normal') { isDebug.value = false; state.loading = false; loadError.value = false; resetPagination(state.pagination); getOrderList(); return; }
 }
 
 onLoad((options) => {
+  if (isDebug.value) return;
   const sysInfo = uni.getSystemInfoSync();
   const navH = 44 + (sysInfo.statusBarHeight || 44);
   scrollHeight.value = sysInfo.windowHeight - navH - 44 - 50;

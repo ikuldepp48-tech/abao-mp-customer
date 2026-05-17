@@ -193,12 +193,13 @@ const tableLabel = computed(() => tableStore.tableLabel);
 const isScanEntry = ref(false);
 
 // debug
-const showDebugBar = ref(true);
+const isDebug = ref(false);
 function debugSet(state) {
+  isDebug.value = true;
   if (state === 'loading') { loading.value = true; loadError.value = false; categories.value = []; return; }
   if (state === 'error') { loading.value = false; loadError.value = true; categories.value = []; return; }
   if (state === 'empty') { loading.value = false; loadError.value = false; categories.value = []; return; }
-  if (state === 'normal') { loading.value = false; loadError.value = false; reloadMenu(); return; }
+  if (state === 'normal') { isDebug.value = false; loading.value = false; loadError.value = false; reloadMenu(); return; }
 }
 
 // 展平分类树
@@ -250,6 +251,7 @@ onLoad(async (options) => {
   if (options && options.tableId) {
     isScanEntry.value = true;
   }
+  if (isDebug.value) return;
 
   try {
     const storeId = storeStore.storeId || 3;
