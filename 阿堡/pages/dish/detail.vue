@@ -104,11 +104,11 @@
 import { ref, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
-import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
-import AbaoCard from '@/components/abao/AbaoCard.vue';
-import AbaoChip from '@/components/abao/AbaoChip.vue';
-import LoadingSkeleton from '@/components/abao/LoadingSkeleton.vue';
-import ErrorState from '@/components/abao/ErrorState.vue';
+import AbaoNavBar from '@/components/AbaoNavBar.vue';
+import AbaoCard from '@/components/AbaoCard.vue';
+import AbaoChip from '@/components/AbaoChip.vue';
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue';
+import ErrorState from '@/components/ErrorState.vue';
 
 const menuStore = sheep.$store('menu');
 const cartStore = sheep.$store('cart');
