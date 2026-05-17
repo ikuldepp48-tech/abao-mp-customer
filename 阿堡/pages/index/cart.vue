@@ -97,11 +97,11 @@ import { computed, reactive, ref } from 'vue';
 import { fen2yuan } from '@/sheep/hooks/useGoods';
 import { isEmpty } from '@/sheep/helper/utils';
 import SpuApi from '@/sheep/api/product/spu';
-import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
-import EmptyState from '@/components/abao/EmptyState.vue';
-import ErrorState from '@/components/abao/ErrorState.vue';
-import LoadingSkeleton from '@/components/abao/LoadingSkeleton.vue';
-import CartItemCard from './components/CartItemCard.vue';
+import AbaoNavBar from '@/components/AbaoNavBar.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import ErrorState from '@/components/ErrorState.vue';
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue';
+import CartItemCard from './CartItemCard.vue';
 
 const cart = sheep.$store('cart');
 const menuStore = sheep.$store('menu');
