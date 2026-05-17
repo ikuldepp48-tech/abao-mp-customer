@@ -117,10 +117,10 @@ import HomeHero from './components/HomeHero.vue'
 import HomeFloatingCards from './components/HomeFloatingCards.vue'
 import HomeUserBar from './components/HomeUserBar.vue'
 import HomeRecommend from './components/HomeRecommend.vue'
-import LoadingSkeleton from '@/components/abao/LoadingSkeleton.vue'
-import ErrorState from '@/components/abao/ErrorState.vue'
-import AbaoTabBar from '@/components/abao/AbaoTabBar.vue'
-import Ph from '@/components/abao/Ph.vue'
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
+import ErrorState from '@/components/ErrorState.vue'
+import AbaoTabBar from '@/components/AbaoTabBar.vue'
+import Ph from '@/components/Ph.vue'
 
 // ── 状态 ──
 const loadingState = ref('loading') // loading | idle | error

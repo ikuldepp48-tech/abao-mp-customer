@@ -56,7 +56,19 @@
       }
     },
     {
-      "path": "pages/index/login",
+      "path": "pages/index/order",
+	      "style": {
+	        "navigationBarTitleText": "点餐"
+	      },
+	      "meta": {
+	        "auth": false,
+	        "sync": true,
+	        "title": "点餐",
+	        "group": "商城"
+	      }
+	    },
+	    {
+	      "path": "pages/index/login",
       "style": {
         "navigationBarTitleText": "登录"
       }
@@ -371,7 +383,7 @@
         "selectedIconPath": "static/tabbar/home-active.png"
       },
       {
-        "pagePath": "pages/index/category",
+        "pagePath": "pages/index/order",
         "text": "点餐",
         "iconPath": "static/tabbar/category.png",
         "selectedIconPath": "static/tabbar/category-active.png"
