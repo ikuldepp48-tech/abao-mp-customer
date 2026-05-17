@@ -78,11 +78,11 @@
 import { reactive, ref } from 'vue';
 import { onLoad, onShow, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app';
 import sheep from '@/sheep';
-import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
-import AbaoTabBar from '@/components/abao/AbaoTabBar.vue';
-import LoadingSkeleton from '@/components/abao/LoadingSkeleton.vue';
-import EmptyState from '@/components/abao/EmptyState.vue';
-import ErrorState from '@/components/abao/ErrorState.vue';
+import AbaoNavBar from '@/components/AbaoNavBar.vue';
+import AbaoTabBar from '@/components/AbaoTabBar.vue';
+import LoadingSkeleton from '@/components/LoadingSkeleton.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import ErrorState from '@/components/ErrorState.vue';
 import OrderApi from '@/sheep/api/restaurant/restaurant_order';
 import { concat } from 'lodash-es';
 import { resetPagination } from '@/sheep/helper/utils';
