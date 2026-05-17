@@ -151,6 +151,10 @@ const dishImages = computed(() => {
 });
 
 onLoad(async (options) => {
+  // debug 截图支持：?debug=loading|error
+  if (options?.debug === 'loading') { loading.value = true; return; }
+  if (options?.debug === 'error') { loadError.value = true; return; }
+
   const spuId = Number(options.spuId);
   let data = menuStore.getDishById(spuId);
 

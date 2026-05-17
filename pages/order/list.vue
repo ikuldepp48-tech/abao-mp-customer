@@ -183,6 +183,11 @@ async function onCancel(orderId) {
 }
 
 onLoad((options) => {
+  // debug 截图支持：?debug=loading|error|empty
+  if (options?.debug === 'loading') { state.loading = true; return; }
+  if (options?.debug === 'error') { state.loading = false; loadError.value = true; return; }
+  if (options?.debug === 'empty') { state.loading = false; loadError.value = false; state.pagination.total = 0; return; }
+
   const sysInfo = uni.getSystemInfoSync();
   const navH = 44 + (sysInfo.statusBarHeight || 44);
   scrollHeight.value = sysInfo.windowHeight - navH - 44 - 50;

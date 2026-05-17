@@ -260,6 +260,14 @@ function retryLoad() {
 }
 
 onShow(() => {
+  // debug 截图支持：页面参数 ?debug=loading|error|empty
+  const pages = getCurrentPages();
+  const page = pages[pages.length - 1];
+  const debug = page?.options?.debug;
+  if (debug === 'loading') { loading.value = true; return; }
+  if (debug === 'error') { loadError.value = true; return; }
+  if (debug === 'empty') { loading.value = false; loadError.value = false; state.list = []; return; }
+
   calcScrollHeight();
   getCartList();
   // 预加载菜单数据用于加购推荐

@@ -233,6 +233,12 @@ onLoad(async (options) => {
   if (options && options.tableId) {
     isScanEntry.value = true;
   }
+
+  // debug 截图支持：?debug=loading|error|empty
+  if (options?.debug === 'loading') { loading.value = true; return; }
+  if (options?.debug === 'error') { loading.value = false; loadError.value = true; return; }
+  if (options?.debug === 'empty') { loading.value = false; loadError.value = false; categories.value = []; return; }
+
   try {
     const storeId = storeStore.storeId || 3;
     const data = await menuStore.fetchMenu(storeId);
