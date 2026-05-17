@@ -15,6 +15,14 @@
       </view>
     </view>
 
+    <!-- 截图调试栏 -->
+    <view class="debug-bar">
+      <view class="debug-btn" :class="{ on: state.loading }" @click="debugSet('loading')"><text>加载中</text></view>
+      <view class="debug-btn" :class="{ on: loadError }" @click="debugSet('error')"><text>加载失败</text></view>
+      <view class="debug-btn" :class="{ on: !state.loading && !loadError && state.pagination.total === 0 }" @click="debugSet('empty')"><text>空订单</text></view>
+      <view class="debug-btn" :class="{ on: !state.loading && !loadError && state.pagination.total > 0 }" @click="debugSet('normal')"><text>正常</text></view>
+    </view>
+
     <!-- 加载中 -->
     <view v-if="state.loading" style="padding: 0 28rpx;">
       <LoadingSkeleton variant="list" :count="3" />
@@ -182,12 +190,15 @@ async function onCancel(orderId) {
   });
 }
 
-onLoad((options) => {
-  // debug 截图支持：?debug=loading|error|empty
-  if (options?.debug === 'loading') { state.loading = true; return; }
-  if (options?.debug === 'error') { state.loading = false; loadError.value = true; return; }
-  if (options?.debug === 'empty') { state.loading = false; loadError.value = false; state.pagination.total = 0; return; }
+// debug
+function debugSet(s) {
+  if (s === 'loading') { state.loading = true; loadError.value = false; return; }
+  if (s === 'error') { loadError.value = true; state.loading = false; return; }
+  if (s === 'empty') { state.loading = false; loadError.value = false; state.pagination.total = 0; state.pagination.list = []; return; }
+  if (s === 'normal') { state.loading = false; loadError.value = false; resetPagination(state.pagination); getOrderList(); return; }
+}
 
+onLoad((options) => {
   const sysInfo = uni.getSystemInfoSync();
   const navH = 44 + (sysInfo.statusBarHeight || 44);
   scrollHeight.value = sysInfo.windowHeight - navH - 44 - 50;
@@ -231,6 +242,10 @@ onPullDownRefresh(() => {
   height: 100vh;
   background: var(--bg);
 }
+
+.debug-bar { position:fixed; bottom:120rpx; left:50%; transform:translateX(-50%); display:flex; gap:12rpx; z-index:999; }
+.debug-btn { padding:8rpx 20rpx; border-radius:999px; background:rgba(0,0,0,.6); font-size:22rpx; color:#fff; }
+.debug-btn.on { background:var(--abao-red); }
 
 /* ── Tabs ── */
 .tabs-bar {

@@ -86,6 +86,13 @@
       />
     </AbaoCard>
 
+    <!-- 截图调试栏 -->
+    <view class="debug-bar">
+      <view class="debug-btn" :class="{ on: loading }" @click="debugSet('loading')"><text>加载中</text></view>
+      <view class="debug-btn" :class="{ on: loadError }" @click="debugSet('error')"><text>加载失败</text></view>
+      <view class="debug-btn" :class="{ on: !loading && !loadError }" @click="debugSet('normal')"><text>正常</text></view>
+    </view>
+
     <!-- 底部操作栏 -->
     <view class="bottom-bar" v-if="!loading && !loadError">
       <view class="quantity-row">
@@ -150,11 +157,14 @@ const dishImages = computed(() => {
   return [{ type: 'image', src: dish.value.coverUrl }];
 });
 
-onLoad(async (options) => {
-  // debug 截图支持：?debug=loading|error
-  if (options?.debug === 'loading') { loading.value = true; return; }
-  if (options?.debug === 'error') { loadError.value = true; return; }
+// debug
+function debugSet(state) {
+  if (state === 'loading') { loading.value = true; loadError.value = false; return; }
+  if (state === 'error') { loadError.value = true; loading.value = false; return; }
+  if (state === 'normal') { loadError.value = false; retryLoad(); return; }
+}
 
+onLoad(async (options) => {
   const spuId = Number(options.spuId);
   let data = menuStore.getDishById(spuId);
 
@@ -275,6 +285,10 @@ function addToCart() {
   background: var(--bg);
   padding-bottom: 120rpx;
 }
+
+.debug-bar { position:fixed; bottom:120rpx; left:50%; transform:translateX(-50%); display:flex; gap:12rpx; z-index:999; }
+.debug-btn { padding:8rpx 20rpx; border-radius:999px; background:rgba(0,0,0,.6); font-size:22rpx; color:#fff; }
+.debug-btn.on { background:var(--abao-red); }
 
 .image-area {
   width: 100%;

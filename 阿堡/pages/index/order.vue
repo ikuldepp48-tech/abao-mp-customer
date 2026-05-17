@@ -83,6 +83,14 @@
       </view>
     </view>
 
+    <!-- 截图调试栏 -->
+    <view class="debug-bar">
+      <view class="debug-btn" :class="{ on: loading }" @click="debugSet('loading')"><text>加载中</text></view>
+      <view class="debug-btn" :class="{ on: loadError }" @click="debugSet('error')"><text>加载失败</text></view>
+      <view class="debug-btn" :class="{ on: !loading && !loadError && flatCategories.length === 0 }" @click="debugSet('empty')"><text>空菜单</text></view>
+      <view class="debug-btn" :class="{ on: !loading && !loadError && flatCategories.length > 0 }" @click="debugSet('normal')"><text>正常</text></view>
+    </view>
+
     <!-- 底部购物车栏 -->
     <view class="cart-bar" @click="showCartPopup = true">
       <view class="cart-left">
@@ -184,6 +192,15 @@ const tableLabel = computed(() => tableStore.tableLabel);
 
 const isScanEntry = ref(false);
 
+// debug
+const showDebugBar = ref(true);
+function debugSet(state) {
+  if (state === 'loading') { loading.value = true; loadError.value = false; categories.value = []; return; }
+  if (state === 'error') { loading.value = false; loadError.value = true; categories.value = []; return; }
+  if (state === 'empty') { loading.value = false; loadError.value = false; categories.value = []; return; }
+  if (state === 'normal') { loading.value = false; loadError.value = false; reloadMenu(); return; }
+}
+
 // 展平分类树
 const flatCategories = computed(() => {
   const result = [];
@@ -233,11 +250,6 @@ onLoad(async (options) => {
   if (options && options.tableId) {
     isScanEntry.value = true;
   }
-
-  // debug 截图支持：?debug=loading|error|empty
-  if (options?.debug === 'loading') { loading.value = true; return; }
-  if (options?.debug === 'error') { loading.value = false; loadError.value = true; return; }
-  if (options?.debug === 'empty') { loading.value = false; loadError.value = false; categories.value = []; return; }
 
   try {
     const storeId = storeStore.storeId || 3;
@@ -445,6 +457,11 @@ function handleClearCart() {
   font-weight: 800;
   color: var(--ink-900);
 }
+
+/* debug bar */
+.debug-bar { position:fixed; bottom:210rpx; left:50%; transform:translateX(-50%); display:flex; gap:12rpx; z-index:999; }
+.debug-btn { padding:8rpx 20rpx; border-radius:999px; background:rgba(0,0,0,.6); font-size:22rpx; color:#fff; }
+.debug-btn.on { background:var(--abao-red); }
 
 .bottom-placeholder {
   height: 160rpx;

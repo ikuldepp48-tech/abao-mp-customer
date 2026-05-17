@@ -25,6 +25,14 @@
       </view>
     </view>
 
+    <!-- 截图调试栏 -->
+    <view class="debug-bar">
+      <view class="debug-btn" :class="{ on: loading }" @click="debugSet('loading')"><text>加载中</text></view>
+      <view class="debug-btn" :class="{ on: loadError }" @click="debugSet('error')"><text>加载失败</text></view>
+      <view class="debug-btn" :class="{ on: !loading && !loadError && state.list.length === 0 }" @click="debugSet('empty')"><text>空购物车</text></view>
+      <view class="debug-btn" :class="{ on: !loading && !loadError && state.list.length > 0 }" @click="debugSet('normal')"><text>正常</text></view>
+    </view>
+
     <!-- 购物车内容 -->
     <view v-if="!loading && !loadError && state.list.length" class="cart-body">
       <!-- 头部：商品数 + 编辑 -->
@@ -259,15 +267,15 @@ function retryLoad() {
   getCartList();
 }
 
-onShow(() => {
-  // debug 截图支持：页面参数 ?debug=loading|error|empty
-  const pages = getCurrentPages();
-  const page = pages[pages.length - 1];
-  const debug = page?.options?.debug;
-  if (debug === 'loading') { loading.value = true; return; }
-  if (debug === 'error') { loadError.value = true; return; }
-  if (debug === 'empty') { loading.value = false; loadError.value = false; state.list = []; return; }
+// debug
+function debugSet(s) {
+  if (s === 'loading') { loading.value = true; loadError.value = false; return; }
+  if (s === 'error') { loadError.value = true; loading.value = false; return; }
+  if (s === 'empty') { loading.value = false; loadError.value = false; state.list = []; return; }
+  if (s === 'normal') { loading.value = false; loadError.value = false; getCartList(); return; }
+}
 
+onShow(() => {
   calcScrollHeight();
   getCartList();
   // 预加载菜单数据用于加购推荐
@@ -284,6 +292,10 @@ onShow(() => {
   display: flex;
   flex-direction: column;
 }
+
+.debug-bar { position:fixed; bottom:120rpx; left:50%; transform:translateX(-50%); display:flex; gap:12rpx; z-index:999; }
+.debug-btn { padding:8rpx 20rpx; border-radius:999px; background:rgba(0,0,0,.6); font-size:22rpx; color:#fff; }
+.debug-btn.on { background:var(--abao-red); }
 
 /* ── 空状态 ── */
 .empty-view {
