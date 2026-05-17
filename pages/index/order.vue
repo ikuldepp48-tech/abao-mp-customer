@@ -65,15 +65,18 @@
     </scroll-view>
 
     <!-- 加载中 -->
-    <view class="loading-view" v-if="loading">
-      <text>加载菜单中...</text>
+    <view v-if="loading" style="padding: 0 28rpx;">
+      <LoadingSkeleton variant="list" :count="4" />
+    </view>
+
+    <!-- 加载失败 -->
+    <view v-if="loadError" class="error-view">
+      <ErrorState errorType="network" retryText="重新加载" @retry="reloadMenu" />
     </view>
 
     <!-- 空状态：无菜单数据 -->
-    <view class="empty-view" v-if="!loading && flatCategories.length === 0">
-      <text class="empty-icon">🍽️</text>
-      <text class="empty-text">暂无菜单数据</text>
-      <text class="empty-hint">请先选择门店或联系管理员录入菜品</text>
+    <view v-if="!loading && !loadError && flatCategories.length === 0" class="empty-view">
+      <EmptyState scenario="customer" icon="🍽️" title="暂无菜单数据" description="请先选择门店或联系管理员录入菜品" />
       <view class="empty-actions">
         <button class="empty-btn" @click="goSelectStore">选择门店</button>
         <button class="empty-btn empty-btn--secondary" @click="reloadMenu">重新加载</button>
@@ -155,6 +158,9 @@ import AbaoNavBar from '@/components/abao/AbaoNavBar.vue';
 import AbaoLogo from '@/components/abao/AbaoLogo.vue';
 import AbaoChip from '@/components/abao/AbaoChip.vue';
 import AbaoTabBar from '@/components/abao/AbaoTabBar.vue';
+import LoadingSkeleton from '@/components/abao/LoadingSkeleton.vue';
+import EmptyState from '@/components/abao/EmptyState.vue';
+import ErrorState from '@/components/abao/ErrorState.vue';
 
 const menuStore = sheep.$store('menu');
 const storeStore = sheep.$store('store');
@@ -162,6 +168,7 @@ const tableStore = sheep.$store('table');
 const cartStore = sheep.$store('cart');
 
 const loading = ref(true);
+const loadError = ref(false);
 const categories = ref([]);
 const combos = ref([]);
 const activeCategory = ref(0);
@@ -204,11 +211,16 @@ function goSelectStore() {
 
 async function reloadMenu() {
   loading.value = true;
-  const storeId = storeStore.storeId || 3;
-  const data = await menuStore.fetchMenu(storeId);
-  if (data) {
-    categories.value = data.categories || [];
-    combos.value = data.combos || [];
+  loadError.value = false;
+  try {
+    const storeId = storeStore.storeId || 3;
+    const data = await menuStore.fetchMenu(storeId);
+    if (data) {
+      categories.value = data.categories || [];
+      combos.value = data.combos || [];
+    }
+  } catch {
+    loadError.value = true;
   }
   loading.value = false;
 }
@@ -221,18 +233,27 @@ onLoad(async (options) => {
   if (options && options.tableId) {
     isScanEntry.value = true;
   }
-  const storeId = storeStore.storeId || 3;
-  const data = await menuStore.fetchMenu(storeId);
-  if (data) {
-    categories.value = data.categories || [];
-    combos.value = data.combos || [];
+  try {
+    const storeId = storeStore.storeId || 3;
+    const data = await menuStore.fetchMenu(storeId);
+    if (data) {
+      categories.value = data.categories || [];
+      combos.value = data.combos || [];
+    }
+  } catch {
+    loadError.value = true;
   }
   loading.value = false;
 
-  // 计算菜品列表可用高度
+  // 计算菜品列表可用高度（扣除顶部导航+hero+分类栏+购物车栏+tabbar）
   const sysInfo = uni.getSystemInfoSync();
-  const navH = 44 + (sysInfo.statusBarHeight || 44);
-  dishScrollHeight.value = sysInfo.windowHeight - navH - 180 - 60 - 52 - 50;
+  const statusBarH = sysInfo.statusBarHeight || 44;
+  const navH = 44 + statusBarH;       // 导航栏 + 状态栏
+  const heroH = 160;                    // Hero + 搜索栏
+  const catBarH = 52;                   // 分类横滚条
+  const cartBarH = 104;                 // 底部购物车栏
+  const tabbarH = 100;                  // Tabbar
+  dishScrollHeight.value = sysInfo.windowHeight - navH - heroH - catBarH - cartBarH - tabbarH;
 
   await nextTick();
   setTimeout(() => calcSectionTops(), 300);
@@ -360,12 +381,12 @@ function handleClearCart() {
 /* ── 桌台标签 ── */
 .table-bar {
   padding: 16rpx 28rpx;
-  background: #fff;
+  background: var(--bg);
 }
 
 /* ── 分类药丸 ── */
 .cat-pills-scroll {
-  background: #fff;
+  background: var(--bg);
   flex-shrink: 0;
   padding-bottom: 12rpx;
 }
@@ -423,13 +444,11 @@ function handleClearCart() {
   height: 160rpx;
 }
 
-.loading-view {
+.error-view {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28rpx;
-  color: var(--ink-500);
 }
 
 .empty-view {
@@ -439,24 +458,6 @@ function handleClearCart() {
   align-items: center;
   justify-content: center;
   padding: 60rpx;
-}
-
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 24rpx;
-}
-
-.empty-text {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--ink-700);
-  margin-bottom: 12rpx;
-}
-
-.empty-hint {
-  font-size: 24rpx;
-  color: var(--ink-500);
-  margin-bottom: 36rpx;
 }
 
 .empty-actions {
@@ -489,7 +490,7 @@ function handleClearCart() {
   left: 0;
   right: 0;
   height: 104rpx;
-  background: #fff;
+  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
